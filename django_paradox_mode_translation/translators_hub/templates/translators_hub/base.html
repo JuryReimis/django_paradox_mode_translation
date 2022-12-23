@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Убежище переводчиков</title>
+</head>
+<body>
+{% block menu %}
+    <nav class="navbar">
+        <div class="site_icon">
+            <a href="{% url 'translators_hub:home' %}">Иконка в будущем</a>
+        </div>
+        <div>
+            <ul>
+                {% for position in menu %}
+                    <li><a href="#">{{ position }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}
+
+</body>
+</html>
