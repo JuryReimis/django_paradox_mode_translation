@@ -1,0 +1,22 @@
+{% extends 'translators_hub/base.html' %}
+{% block content %}
+    Описание:
+    Авторы:
+    {% for author in current_page.authors.all %}
+        <p>
+        <li><a href="#">{{ author.first_name }}
+            {{ author.last_name }}{% if author.first_name or author.last_name %}({% endif %}{{ author.username }}
+            {% if author.first_name or author.last_name %}){% endif %}></a></li>
+        </ul>
+    {% endfor %}
+    Ссылки:
+    <ul>
+        <li><a href="{{ current_page.steam_link }}">Ссылка Стим</a></li>
+        <li><a href="{{ current_page.paradox_plaza_link }}">Ссылка Paradox Plaza</a></li>
+    </ul>
+    <form name="apply for" action="{% url 'translators_hub:apply_for' slug=current_page.slug %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button> Подать заявку на участие</button>
+    </form>
+{% endblock %}
