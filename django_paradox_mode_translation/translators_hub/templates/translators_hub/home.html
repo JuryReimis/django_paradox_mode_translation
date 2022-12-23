@@ -1,0 +1,13 @@
+{% extends 'translators_hub/base.html' %}
+
+{% block content %}
+    <h1>Вот я и здесь</h1>
+
+    {% if latest_pages_list %}
+        <ul>
+            {% for page in latest_pages_list %}
+                <li><a href="{% url 'translators_hub:detail_page' slug=page.slug %}">{{ page.title }}</a>></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
