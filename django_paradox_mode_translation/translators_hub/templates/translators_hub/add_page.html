@@ -1,0 +1,9 @@
+{% extends 'translators_hub/base.html' %}
+
+{% block content %}
+    <form action="{% url 'translators_hub:add_page' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">Создать</button>
+    </form>
+{% endblock %}

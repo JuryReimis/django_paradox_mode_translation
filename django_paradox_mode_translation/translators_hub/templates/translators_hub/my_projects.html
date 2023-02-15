@@ -1,0 +1,25 @@
+{% extends 'translators_hub/base.html' %}
+{% load translators_hub_tags %}
+
+
+{% block content %}
+    {{ roles }}
+    <table>
+        <tr>
+            <td>Название</td>
+            <td>Должность</td>
+            <td>Игра</td>
+            <td>Количество участников</td>
+            <td>Количество просмотров</td>
+        </tr>
+        {% for project in projects_list %}
+            <tr>
+                <td><a href="{% url 'translators_hub:detail_page' slug=project.slug %}">{{ project.title }}</a></td>
+                <td>{{ project.role }}</td>
+                <td>{{ project.game }}</td>
+                <td>{{ project.authors.all | length}}</td>
+                <td>{{ project.views }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock content %}

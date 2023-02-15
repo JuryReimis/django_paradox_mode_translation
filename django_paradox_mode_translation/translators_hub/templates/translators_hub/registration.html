@@ -1,0 +1,12 @@
+{% extends 'translators_hub/base.html' %}
+
+{% block content %}
+    <form action="{% url 'translators_hub:registration' %}" method="post">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p>{{ form.errors.error }}</p>
+        {% endif %}
+        {{ form }}
+        <button type="submit">Отправить</button>
+    </form>
+{% endblock %}

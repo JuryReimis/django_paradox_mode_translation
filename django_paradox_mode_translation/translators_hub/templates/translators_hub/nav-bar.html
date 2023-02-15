@@ -1,0 +1,15 @@
+<nav class="navbar">
+    {% if user_logged %}
+        <p><a href="{% url 'translators_hub:profile' user_logged.slug %}">{{ login_status }}</a></p>
+        <p><a href="{% url 'translators_hub:logout' %}">{{ registration_status }}</a></p>
+        <p><a href="{% url 'translators_hub:my_projects' user_logged.slug %}">Мои проекты</a></p>
+        <p><a href="{% url 'translators_hub:invites' user_logged.slug %}">Приглашения ({{ active_invites|length }})</a></p>
+    {% else %}
+        <p><a href="{% url 'translators_hub:login' %}">{{ login_status }}</a></p>
+        <p><a href="{% url 'translators_hub:registration' %}">{{ registration_status }}</a></p>
+    {% endif %}
+    <div class="site_icon">
+        <p><a href="{% url 'translators_hub:home' %}">Иконка в будущем</a></p>
+        <p><a href="{% url 'translators_hub:add_page' %}">Добавить страницу</a></p>
+    </div>
+</nav>

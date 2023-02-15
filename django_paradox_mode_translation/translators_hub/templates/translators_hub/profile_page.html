@@ -1,0 +1,34 @@
+{% extends 'translators_hub/base.html' %}
+
+{% block content %}
+    <form class="profile form" method="post">
+        {% csrf_token %}
+        {% if form %}
+            <ul>
+                {{ form.as_ul }}
+                <li>Репутация: {{ profile_data.reputation }}</li>
+            </ul>
+            <button type="submit">Сохранить</button>
+        {% elif profile_data %}
+            <ul>
+                <li>Награды {{ profile_data.titles }}</li>
+                <li>Описание {{ profile_data.description }}</li>
+                <li>Опыт {{ profile_data.experience }}</li>
+                <li>Репутация: {{ profile_data.reputation }}</li>
+                <li>{{ profile_data.profile_image }}</li>
+            </ul>
+        {% endif %}
+        <ul>
+            {% for comment in comments %}
+                <li>
+                    <div>
+                        {{ comment.author }}
+                        {{ comment.comment_text }}
+                        <button>Удалить</button>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+    </form>
+{% endblock %}
