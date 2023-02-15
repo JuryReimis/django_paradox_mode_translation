@@ -3,7 +3,8 @@
 {% block content %}
     <form method="post">
         {% csrf_token %}
-        {{ apply_form.as_p }}
+        {{ form.as_p }}
+        <div>Репутация: {{ reputation }}</div>
         <button type="submit">Отправить</button>
     </form>
 {% endblock %}

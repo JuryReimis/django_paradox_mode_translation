@@ -1,22 +1,44 @@
 {% extends 'translators_hub/base.html' %}
 {% block content %}
-    Описание:
-    Авторы:
-    {% for author in current_page.authors.all %}
-        <p>
-        <li><a href="#">{{ author.first_name }}
-            {{ author.last_name }}{% if author.first_name or author.last_name %}({% endif %}{{ author.username }}
-            {% if author.first_name or author.last_name %}){% endif %}></a></li>
+    {% if errors %}
+        <ul>
+            {% for error in errors %}
+                <li><p>{{ error }}</p></li>
+            {% endfor %}
         </ul>
-    {% endfor %}
+    {% endif %}
+
+    Описание:
+    <hr>
+    Авторы:
+    {% if moderator %}
+        <p><a href="{% url 'translators_hub:invite_authors' slug=current_page.slug %}">Пригласить авторов</a></p>
+    {% endif %}
+    <ul>
+        {% for role, authors in current_page.get_sorted_roles.items %}
+            <li>
+                <div>{{ role }}:</div>
+                {% for author in authors %}
+                    <div><a href="{{ author.get_absolute_url }}">{{ author.first_name }}
+                        {{ author.last_name }}{% if author.first_name or author.last_name %}
+                            ({% endif %}{{ author.username }}{% if author.first_name or author.last_name %}){% endif %}</a></div>
+                {% endfor %}
+            </li>
+        {% endfor %}
+    </ul>
+    <hr>
     Ссылки:
     <ul>
         <li><a href="{{ current_page.steam_link }}">Ссылка Стим</a></li>
         <li><a href="{{ current_page.paradox_plaza_link }}">Ссылка Paradox Plaza</a></li>
     </ul>
-    <form name="apply for" action="{% url 'translators_hub:apply_for' slug=current_page.slug %}" method="post">
+    <form name="apply for" action="{% url 'translators_hub:detail_page' slug=current_page.slug %}" method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form }}
+        {% if form.errors %}
+
+            <p>{{ form.errors.error }}</p>
+        {% endif %}
         <button> Подать заявку на участие</button>
     </form>
 {% endblock %}
