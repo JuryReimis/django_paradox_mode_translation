@@ -116,6 +116,13 @@ class ModTranslation(models.Model):
         verbose_name="Перевод для модификации:"
     )
 
+    description = models.CharField(
+        max_length=3000,
+        null=True,
+        default=None,
+        verbose_name="Описание"
+    )
+
     game = models.ForeignKey(
         to='Game',
         on_delete=models.CASCADE,
@@ -233,7 +240,6 @@ class Roles(models.Model):
 
     def __str__(self):
         return f'{self.user} с ролью - {self.get_role_display()}'
-
 
     class Meta:
         verbose_name = "Роль"
