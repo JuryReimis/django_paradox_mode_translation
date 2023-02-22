@@ -1,0 +1,17 @@
+input, textarea, select {;
+    width: 100%;
+    background-color: #f1e6dd;
+}
+
+th {
+    width: 40%;
+}
+
+.custom-div {
+    width: 80%;
+}
+
+.custom-button {
+    padding: 20px 60px;
+    border-radius: 30px;
+}
