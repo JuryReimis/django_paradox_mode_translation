@@ -13,6 +13,8 @@ urlpatterns = [
     path('registration/', views.RegistrationView.as_view(), name='registration'),
     path('add-page', views.AddPageView.as_view(), name='add_page'),
     path('mods-translations/<slug:slug>/', views.DetailView.as_view(), name='detail_page'),
+    path('mods-translations/<slug:slug>/management/', views.ManagementView.as_view(), name='management'),
+    path('mods-translations/<slug:slug>/management/change_role/username=<str:username>', views.ChangeRoleView.as_view(), name='change_role'),
     path('mods-translations/<slug:slug>/apply-for/', views.ApplyForView.as_view(), name='apply_for'),
     path('mods-translations/<slug:slug>/invite_authors/', views.SendInvitesView.as_view(), name='invite_authors')
 ]
