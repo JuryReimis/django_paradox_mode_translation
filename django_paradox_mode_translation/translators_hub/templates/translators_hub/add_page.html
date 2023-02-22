@@ -1,9 +1,25 @@
 {% extends 'translators_hub/base.html' %}
 
+{% load static %}
+
+{% block head %}
+    <link type="text/css" href="{% static 'translators_hub/css/form_styles.css' %}" rel="stylesheet"/>
+{% endblock head %}
+
+
+
 {% block content %}
-    <form action="{% url 'translators_hub:add_page' %}" method="post">
-        {% csrf_token %}
-        {{ form }}
-        <button type="submit">Создать</button>
-    </form>
+        <div class="container justify-content-center custom-div">
+            <form action="{% url 'translators_hub:add_page' %}" method="post">
+                {% csrf_token %}
+                <div class="row justify-content-center">
+                    <div class="col text-center">
+                        <table class="table table-light table-bordered">
+                            {{ form }}
+                        </table>
+                        <button class="btn btn-success custom-button float-end" type="submit">Создать</button>
+                    </div>
+                </div>
+            </form>
+        </div>
 {% endblock %}

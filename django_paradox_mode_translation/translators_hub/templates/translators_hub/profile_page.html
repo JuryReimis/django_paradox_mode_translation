@@ -1,34 +1,59 @@
 {% extends 'translators_hub/base.html' %}
 
-{% block content %}
-    <form class="profile form" method="post">
-        {% csrf_token %}
-        {% if form %}
-            <ul>
-                {{ form.as_ul }}
-                <li>Репутация: {{ profile_data.reputation }}</li>
-            </ul>
-            <button type="submit">Сохранить</button>
-        {% elif profile_data %}
-            <ul>
-                <li>Награды {{ profile_data.titles }}</li>
-                <li>Описание {{ profile_data.description }}</li>
-                <li>Опыт {{ profile_data.experience }}</li>
-                <li>Репутация: {{ profile_data.reputation }}</li>
-                <li>{{ profile_data.profile_image }}</li>
-            </ul>
-        {% endif %}
-        <ul>
-            {% for comment in comments %}
-                <li>
-                    <div>
-                        {{ comment.author }}
-                        {{ comment.comment_text }}
-                        <button>Удалить</button>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+{% load static %}
 
-    </form>
+{% block head %}
+    <link type="text/css" href="{% static 'translators_hub/css/form_styles.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="container justify-content-center">
+        <form class="profile form" method="post">
+            {% csrf_token %}
+            {% if form %}
+                <table class="table table-light table-bordered">
+                    {{ user_form }}
+                    {{ form }}
+                </table>
+                <p>Репутация: {{ profile_data.reputation }}</p>
+                <button class="btn btn-success" type="submit">Сохранить</button>
+                <button class="btn btn-warning" type="reset">Сбросить</button>
+            {% elif profile_data %}
+                <table class="table table-bordered table-light">
+                <tr>
+                    <th>{{ profile_data.user.username }}</th>
+                    <td>{{ profile_data.profile_image }}</td>
+                </tr>
+                    <tr>
+                        <th>Награды:</th>
+                        <td>{{ profile_data.titles }}</td>
+                    </tr>
+                    <tr>
+                        <th>Описание:</th>
+                        <td>{{ profile_data.description }}</td>
+                    </tr>
+                    <tr>
+                        <th>Опыт:</th>
+                        <td>{{ profile_data.experience }}</td>
+                    </tr>
+                    <tr>
+                        <th>Репутация:</th>
+                        <td>{{ profile_data.reputation }}</td>
+                    </tr>
+                </table>
+            {% endif %}
+            <ul>
+                {% for comment in comments %}
+                    <li>
+                        <div>
+                            {{ comment.author }}
+                            {{ comment.comment_text }}
+                            <button>Удалить</button>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+
+        </form>
+    </div>
 {% endblock %}

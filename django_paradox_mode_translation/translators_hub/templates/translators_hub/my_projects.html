@@ -1,10 +1,15 @@
 {% extends 'translators_hub/base.html' %}
 {% load translators_hub_tags %}
+{% load static %}
+
+{% block head %}
+    <link type="text/css" href="{% static 'translators_hub/css/list_styles.css' %}" rel="stylesheet">
+{% endblock head %}
 
 
 {% block content %}
-    {{ roles }}
-    <table>
+    <div class="container">
+    <table class="table table-bordered table-light table-hover">
         <tr>
             <td>Название</td>
             <td>Должность</td>
@@ -14,12 +19,13 @@
         </tr>
         {% for project in projects_list %}
             <tr>
-                <td><a href="{% url 'translators_hub:detail_page' slug=project.slug %}">{{ project.title }}</a></td>
+                <td><a class="btn btn-secondary" href="{% url 'translators_hub:detail_page' slug=project.slug %}">{{ project.title | truncatechars:50 }}</a></td>
                 <td>{{ project.role }}</td>
                 <td>{{ project.game }}</td>
-                <td>{{ project.authors.all | length}}</td>
-                <td>{{ project.views }}</td>
+                <td class="td-number">{{ project.authors.all | length}}</td>
+                <td class="td-number">{{ project.views }}</td>
             </tr>
         {% endfor %}
     </table>
+    </div>
 {% endblock content %}
