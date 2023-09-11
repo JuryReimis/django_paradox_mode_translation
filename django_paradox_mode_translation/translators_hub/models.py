@@ -19,6 +19,10 @@ class User(AbstractUser):
         return reverse('translators_hub:profile', kwargs={'slug': self.userprofile.slug})
 
 
+def get_image_user_path(instance, filename):
+    return f'users/{instance.user_id}/{filename}'
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(
         to=User,
@@ -52,9 +56,10 @@ class UserProfile(models.Model):
     )
 
     profile_image = models.ImageField(
-        blank=True,
-        null=True,
-        verbose_name="Аватар"
+        upload_to=get_image_user_path,
+        default='defaults/noavatar.png',
+        null=False,
+        verbose_name="Аватар",
     )
 
     reputation = models.IntegerField(
@@ -77,6 +82,10 @@ class UserProfile(models.Model):
         return fields_dict
 
 
+def get_image_project_path(instance, file_name):
+    return f'/translators_hub/{instance.slug}/{file_name}'
+
+
 class ModTranslation(models.Model):
 
     ENGLISH = 'en'
@@ -87,6 +96,10 @@ class ModTranslation(models.Model):
     SIMPLE_CHINESE = 'zh'
     SPANISH = 'es'
 
+    IN_WORK = 'w'
+    FINISH = 'f'
+    NEED_UPDATE = 'nu'
+
     VALID_LANGUAGES = [
         (ENGLISH, 'Английский'),
         (FRENCH, 'Французский'),
@@ -95,6 +108,12 @@ class ModTranslation(models.Model):
         (RUSSIAN, 'Русский'),
         (SIMPLE_CHINESE, 'Китайский'),
         (SPANISH, 'Испанский')
+    ]
+
+    STATUS = [
+        (IN_WORK, 'В работе'),
+        (FINISH, 'Завершено'),
+        (NEED_UPDATE, 'Требуется обновление')
     ]
 
     title = models.CharField(
@@ -163,7 +182,8 @@ class ModTranslation(models.Model):
     )
 
     image = models.ImageField(
-        verbose_name="Иллюстрация",
+        upload_to=get_image_project_path,
+        verbose_name="Обложка",
         blank=True,
         null=True
     )
@@ -174,8 +194,16 @@ class ModTranslation(models.Model):
         verbose_name="Авторы"
     )
 
+    status = models.CharField(
+        max_length=5,
+        choices=STATUS,
+        default=IN_WORK,
+        verbose_name="Статус",
+    )
+
     views = models.PositiveIntegerField(
-        default=0
+        default=0,
+        verbose_name="Просмотры",
     )
 
     created_date = models.DateTimeField(
