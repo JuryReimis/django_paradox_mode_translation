@@ -2,36 +2,39 @@
 
 {% block content %}
     {% if free_users %}
-        <table class="table table-bordered table-hover table-light">
-            <tr>
-                <th>Ник</th>
-                <th>Почта</th>
-                <th>Описание</th>
-                <th>Титулы</th>
-            </tr>
-            {% for user in free_users %}
+        <div class="container">
+            <table class="table table-bordered table-hover table-light">
                 <tr>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.userprofile.description }}</td>
-                    <td>{% if user.userprofile.titles.all %}{{ user.userprofile.titles.all }}{% else %}----{% endif %}</td>
-                    <td>
-                        <form method="post" action="{% url 'translators_hub:invite_authors' slug %}" id="{{ user }}">
-                            {% csrf_token %}
-                            <table class="table table-sm">
-                                {{ form }}
-                            </table>
-                            <input type="hidden" value="{{ user.pk }}" name="target_user_id">
-                            <input type="hidden" value="{{ mod_translation_id }}" name="mod_translation_id">
-                        </form>
-                    </td>
-                    <td>
-                        <button class="btn btn-success" type="submit" form="{{ user }}">Пригласить</button>
-                    </td>
+                    <th>Ник</th>
+                    <th>Почта</th>
+                    <th>Описание</th>
+                    <th>Титулы</th>
                 </tr>
-            {% endfor %}
-        </table>
-
+                {% for user in free_users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.userprofile.description }}</td>
+                        <td>{% if user.userprofile.titles.all %}{{ user.userprofile.titles.all }}{% else %}
+                            ----{% endif %}</td>
+                        <td>
+                            <form method="post" action="{% url 'translators_hub:invite_authors' slug %}"
+                                  id="{{ user }}">
+                                {% csrf_token %}
+                                <table class="table table-sm">
+                                    {{ form }}
+                                </table>
+                                <input type="hidden" value="{{ user.pk }}" name="target_user_id">
+                                <input type="hidden" value="{{ mod_translation_id }}" name="mod_translation_id">
+                            </form>
+                        </td>
+                        <td>
+                            <button class="btn btn-success" type="submit" form="{{ user }}">Пригласить</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
     {% else %}
         <h1>Нет доступных кандидатов</h1>
     {% endif %}
