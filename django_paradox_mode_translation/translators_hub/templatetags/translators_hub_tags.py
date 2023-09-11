@@ -10,10 +10,10 @@ register = Library()
 def get_nav_bar(context):
     user = context['user']
     if isinstance(user, AnonymousUser):
-        return {'login_status': "Войти", 'registration_status': "Регистрация", 'user': user}
+        return {'button_name': "Авторизоваться", 'login_status': "Войти", 'registration_status': "Регистрация", 'user': user}
     else:
         # active_invites = user.target_name.filter(status=None)
-        return {'login_status': f'{user}', 'registration_status': "Выйти", 'user_logged': user.userprofile,
+        return {'button_name': f'{user}', 'login_status': f'{user}', 'registration_status': "Выйти", 'user_logged': user.userprofile,
                 'user': user,
                 # 'active_invites': active_invites
                 }
