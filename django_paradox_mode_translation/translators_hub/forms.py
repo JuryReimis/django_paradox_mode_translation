@@ -28,7 +28,7 @@ class UpdateUserForm(forms.ModelForm):
 class UpdateProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['experience', 'description']
+        fields = ['experience', 'description', 'profile_image']
 
     def change_initial_value(self, new_initial_value: dict):
         initial_dict = self.initial
@@ -116,7 +116,11 @@ class InviteUserForm(forms.ModelForm):
     text_invite = forms.CharField(
         max_length=500,
         label='Приглашение',
-        required=False
+        required=False,
+        widget=forms.Textarea(attrs={
+            'rows': 10,
+            'col': 50
+        })
     )
 
     class Meta:
