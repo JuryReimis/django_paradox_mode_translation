@@ -1,15 +1,51 @@
-<nav class="navbar">
-    {% if user_logged %}
-        <p><a href="{% url 'translators_hub:profile' user_logged.slug %}">{{ login_status }}</a></p>
-        <p><a href="{% url 'translators_hub:logout' %}">{{ registration_status }}</a></p>
-        <p><a href="{% url 'translators_hub:my_projects' user_logged.slug %}">Мои проекты</a></p>
-        <p><a href="{% url 'translators_hub:invites' user_logged.slug %}">Приглашения ({{ active_invites|length }})</a></p>
-    {% else %}
-        <p><a href="{% url 'translators_hub:login' %}">{{ login_status }}</a></p>
-        <p><a href="{% url 'translators_hub:registration' %}">{{ registration_status }}</a></p>
-    {% endif %}
-    <div class="site_icon">
-        <p><a href="{% url 'translators_hub:home' %}">Иконка в будущем</a></p>
-        <p><a href="{% url 'translators_hub:add_page' %}">Добавить страницу</a></p>
+{% load static %}
+
+<nav class="navbar fixed-top navbar-dark bg-dark" aria-label="Dark offcanvas navbar">
+    <div class="container-fluid">
+        <div class="col justify-content-start mh-100">
+            <a class="navbar-brand" href="{% url 'translators_hub:home' %}"><img style="max-height: 50px; max-width: 50px"
+                    class="img-thumbnail rounded-circle"
+                    src="{% static 'translators_hub/images/main icon.jpg' %}" alt="Лого сайта"></a>
+            <a class="navbar-brand" href="{% url 'translators_hub:add_page' %}">Добавить страницу</a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark"
+                aria-controls="offcanvasNavbarDark">
+            {{ button_name }}
+        </button>
+        <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasNavbarDark"
+             aria-labelledby="offcanvasNavbarDarkLabel">
+            <div class="offcanvas-header">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body" style="font-size: 20px">
+                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                    {% if user_logged %}
+                        <li><a class="dropdown-item"
+                               href="{% url 'translators_hub:profile' user_logged.slug %}">Профиль</a></li>
+
+                        <li><a class="dropdown-item"
+                               href="{% url 'translators_hub:my_projects' user_logged.slug %}">Мои
+                            проекты</a></li>
+                        <li><a class="dropdown-item"
+                               href="{% url 'translators_hub:invites' user_logged.slug %}">Приглашения
+                            ({{ active_invites|length }})</a>
+                        </li>
+                        <li>
+                            <a class="btn btn-danger"
+                               href="{% url 'translators_hub:logout' %}">{{ registration_status }}</a>
+
+                        </li>
+
+                    {% else %}
+                        <li><a class="dropdown-item"
+                               href="{% url 'translators_hub:login' %}">{{ login_status }}</a></li>
+                        <li><a class="dropdown-item"
+                               href="{% url 'translators_hub:registration' %}">{{ registration_status }}</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
     </div>
 </nav>
