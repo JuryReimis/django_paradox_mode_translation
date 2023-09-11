@@ -12,7 +12,7 @@ import translators_hub.models
 from . import models
 from .forms import UpdateProfileForm, RegistrationForm, AddPageForm, ServiceForm, ProfileFormForApply, InviteUserForm, \
     UpdateUserForm, ChangeUserRoleForm
-from .models import ModTranslation, UserProfile, ProfileComments, Roles, Invites
+from .models import ModTranslation, UserProfile, ProfileComments, Roles, Invites, Game
 
 User = get_user_model()
 User: translators_hub.models.User
@@ -24,10 +24,27 @@ class HomeView(generic.ListView):
     paginate_by = 4
 
     def __init__(self, *args, **kwargs):
+        self.extra_filter = None
         super(HomeView, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
+        if self.extra_filter:
+            return ModTranslation.objects.filter(game__in=self.extra_filter.get('selected_game')).order_by('-created_date')
         return ModTranslation.objects.order_by('-created_date')
+
+    def get(self, request, *args, **kwargs):
+        selected_category = request.GET.get('game')
+        games = Game.objects.all()
+        selected_game = Game.objects.filter(game_name=selected_category) if selected_category is not None else None
+
+        self.extra_filter = {
+            'selected_game': selected_game if selected_game is not None else games
+        }
+        self.extra_context = {
+            'games': games,
+            'selected_game': selected_game
+        }
+        return super(HomeView, self).get(request, *args, **kwargs)
 
 
 class DetailView(generic.DetailView):
@@ -35,12 +52,12 @@ class DetailView(generic.DetailView):
     template_name = 'translators_hub/detail_page.html'
     context_object_name = 'current_page'
 
-    @staticmethod
-    def post(request, slug, *args, **kwargs):
-        current_page = ModTranslation.objects.get(slug=slug)
+    def post(self, request, slug, *args, **kwargs):
+        current_page = self.get_object()
         if not request.user.is_authenticated:
             form = ServiceForm()
-            form.add_error(field=None, error="Необходимо авторизоваться")
+            error_message = "Необходимо авторизоваться"
+            messages.add_message(request=request, level=messages.ERROR, message=error_message)
             context = {
                 'form': form,
                 'current_page': current_page,
@@ -48,7 +65,8 @@ class DetailView(generic.DetailView):
             return render(request=request, template_name='translators_hub/detail_page.html', context=context)
         elif current_page.authors.filter(user=request.user):
             form = ServiceForm()
-            form.add_error(field=None, error="Вы уже являетесь членом команды!")
+            error_message = "Вы уже являетесь членом команды!"
+            messages.add_message(request=request, level=messages.ERROR, message=error_message)
             context = {
                 'form': form,
                 'current_page': current_page,
@@ -158,7 +176,7 @@ class ProfileView(generic.edit.FormMixin, generic.DetailView):
             self.success_url = reverse_lazy('translators_hub:profile', kwargs={'slug': kwargs['slug']})
             self.kwargs['instance'] = user_profile
             form = self.get_form()
-            user_form = UpdateUserForm(request.POST, instance=request.user)
+            user_form = UpdateUserForm(request.POST, request.FILES, instance=request.user)
 
             if form.is_valid() and user_form.is_valid():
                 form.save(commit=True)
@@ -356,8 +374,19 @@ class ApplyForView(generic.FormView):
     initial = None
 
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
+        slug = kwargs.get('slug')
+        current_page = ModTranslation.objects.get(slug=slug)
+
+        if not request.user.is_authenticated:
+            error_message = "Необходимо авторизоваться"
+            messages.add_message(request=request, level=messages.ERROR, message=error_message)
+            return redirect('translators_hub:detail_page', slug=slug)
+        elif current_page.authors.filter(user=request.user):
+            error_message = "Вы уже являетесь членом команды!"
+            messages.add_message(request=request, level=messages.ERROR, message=error_message)
+            return redirect('translators_hub:detail_page', slug=slug)
+        elif request.user.is_authenticated:
             current_user_profile = get_object_or_404(UserProfile, user=request.user)
             self.initial = current_user_profile.get_fields_in_dict()
             self.extra_context = {'reputation': current_user_profile.reputation}
-        return super(ApplyForView, self).get(request=request, *args, **kwargs)
+            return super(ApplyForView, self).get(request=request, *args, **kwargs)
