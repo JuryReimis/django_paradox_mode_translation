@@ -8,54 +8,50 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            Описание:
+            {% if moderator %}
+                <p class="py-3"><a class="btn btn-dark"
+                                   href="{% url 'translators_hub:management' slug=current_page.slug %}">Управление
+                    работой</a></p>
+            {% endif %}
+            <h2>Описание:</h2>
             {% if current_page.description %}
-                {{ current_page.description }}
+                <div class="text-center">{{ current_page.description }}</div>
             {% else %}
                 <p>----</p>
             {% endif %}
             <hr>
-            Авторы:
-            {% if moderator %}
-                <p><a class="btn btn-dark" href="{% url 'translators_hub:management' slug=current_page.slug %}">Управление
-                    работой</a></p>
-            {% endif %}
-
+            <h2>Авторы:</h2>
             {% for role, authors in current_page.get_sorted_roles.items %}
-
-
-                <div>{{ role }}:</div>
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        {% for author in authors %}
-                            <div class="list-group-item borderless"><a class="btn btn-outline-info"
-                                                            href="{{ author.get_absolute_url }}">{{ author.first_name }}
-                                {{ author.last_name }}{% if author.first_name or author.last_name %}
-                                    ( {% endif %}{{ author.username }}{% if author.first_name or author.last_name %}
-                                    ){% endif %}</a></div>
-                        {% endfor %}
-                    </li>
-                </ul>
+                <div class="px-3"><h5>{{ role }}:</h5></div>
+                <div class="px-5">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            {% for author in authors %}
+                                <div class="list-group-item borderless"><a class="btn btn-outline-info"
+                                                                           href="{{ author.get_absolute_url }}">{{ author.first_name }}
+                                    {{ author.last_name }}{% if author.first_name or author.last_name %}
+                                        ( {% endif %}{{ author.username }}{% if author.first_name or author.last_name %}
+                                        ){% endif %}</a></div>
+                            {% endfor %}
+                        </li>
+                    </ul>
+                </div>
             {% endfor %}
 
-            <div class="">Ссылки:</div>
+            <h2>Ссылки:</h2>
             <ul class="list-group list-group-numbered">
+                {% if current_page.steam_link %}
                 <li class="py-4"><a class="btn btn-info list-group-item" href="{{ current_page.steam_link }}">Ссылка
                     Стим</a></li>
+                {% elif current_page.paradox_plaza_link %}
                 <li class="py-4"><a class="btn btn-info list-group-item" href="{{ current_page.paradox_plaza_link }}">Ссылка
                     Paradox
                     Plaza</a></li>
-            </ul>
-            <form class="py-3" name="apply for" action="{% url 'translators_hub:detail_page' slug=current_page.slug %}"
-                  method="post">
-                {% csrf_token %}
-                {{ form }}
-                {% if form.errors %}
-
-                    <p>{{ form.errors.error }}</p>
                 {% endif %}
-                <button class="btn btn-success"> Подать заявку на участие</button>
-            </form>
+            </ul>
+            <div class="container justify-content-start"><a class="btn btn-success"
+                                                            href="{% url 'translators_hub:apply_for' slug=current_page.slug %}">
+                Подать заявку на участие</a></div>
         </div>
     </div>
 {% endblock %}
