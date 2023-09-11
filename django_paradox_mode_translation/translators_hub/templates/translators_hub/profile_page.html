@@ -8,7 +8,7 @@
 
 {% block content %}
     <div class="container justify-content-center">
-        <form class="profile form" method="post">
+        <form class="profile form" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% if form %}
                 <table class="table table-light table-bordered">
@@ -22,11 +22,11 @@
                 <table class="table table-bordered table-light">
                 <tr>
                     <th>{{ profile_data.user.username }}</th>
-                    <td>{{ profile_data.profile_image }}</td>
+                    <td><img src="/media/{{ profile_data.profile_image }}" alt="profile avatar" height="40" width="40"></td>
                 </tr>
                     <tr>
                         <th>Награды:</th>
-                        <td>{{ profile_data.titles }}</td>
+                        <td>{% if profile_data.titles.all %}{{ profile_data.titles.all }}{% else %}Нет наград{% endif %}</td>
                     </tr>
                     <tr>
                         <th>Описание:</th>
