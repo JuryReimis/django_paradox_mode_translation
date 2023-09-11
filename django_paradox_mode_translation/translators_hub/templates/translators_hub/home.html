@@ -11,24 +11,47 @@
 {% endblock messages %}
 
 {% block content %}
-    {% if latest_pages_list %}
-        {% for page in latest_pages_list %}
-            <div class="container">
-                <div class="row border p-4 p-md-5 mb-4 rounded text-bg-dark">
-                    <div class="col-8 px-0">
-                        <h1 class="display-4 fst-italic">{{ page.title|truncatechars:100 }}</h1>
-                        {% if page.description %}
-                            <p class="lead my-3">{{ page.description|truncatechars:160 }}</p>
-                        {% else %}
-                            <p class="lead my-3">Нет описания</p>
-                        {% endif %}
-                        <a href="{{ page.get_absolute_url }}" class="btn btn-sm btn-info text-white">Подробнее</a>
+    <div class="row py-3">
+        <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px;">
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto list-group">
+                <h5>Игры:</h5>
+                {% for game in games %}
+                    {% if game in selected_game %}
+                        <li class="list-group-item bg-dark border-0"><span class="text-white" style="padding: 10px; border-radius: 50px; background-color: slategray" >{{ game }}</span></li>
+                    {% else %}
+                        <li class="nav-link list-group-item text-white"><a class="btn btn-secondary" href="{% url 'translators_hub:home' %}?game={{ game }}">{{ game }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <hr>
+        </div>
+
+        <div class="col">
+
+            {% if latest_pages_list %}
+                {% for page in latest_pages_list %}
+                    <div class="container">
+                        <div class="row border p-4 p-md-5 mb-4 rounded text-bg-dark">
+                            <div class="col-8 px-0">
+                                <h1 class="display-4 fst-italic">{{ page.title|truncatechars:100 }}</h1>
+                                {% if page.description %}
+                                    <p class="lead my-3">{{ page.description|truncatechars:160 }}</p>
+                                {% else %}
+                                    <p class="lead my-3">Нет описания</p>
+                                {% endif %}
+                                <a href="{{ page.get_absolute_url }}"
+                                   class="btn btn-sm btn-info text-white">Подробнее</a>
+                            </div>
+                            <div class="col-4 d-flex justify-content-end d-lg-block">
+                                <img src="" alt="">
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-4 d-flex justify-content-end d-lg-block">
-                        <img src="" alt="">
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="py-3"><h3>В этой категории ничего нет</h3></div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
