@@ -6,42 +6,48 @@
 {% endblock head %}
 
 {% block content %}
-    <div style="padding: 10px"><a class="btn btn-success" href="{% url 'translators_hub:invite_authors' slug=slug %}">Пригласить новых авторов</a></div>
-    <table class="table table-light table-hover table-bordered">
-        <tr>
-            <td>Никнейм</td>
-            <td>Имя</td>
-            <td>Фамилия</td>
-            <td>Должность</td>
-            <td>Репутация</td>
-            <td></td>
-        </tr>
-        {% for author in authors %}
+    <div class="container">
+        <div class="py-3"><a class="btn btn-success" href="{% url 'translators_hub:invite_authors' slug=slug %}">Пригласить
+            новых
+            авторов</a></div>
+        <table class="table table-light table-hover table-bordered">
             <tr>
-                <td><a class="btn btn-outline-info"
-                       href="{% url 'translators_hub:profile' slug=author.user.userprofile.slug %}">{{ author.user.username }}</a>
-                </td>
-                <td>{{ author.user.first_name }}</td>
-                <td>{{ author.user.last_name }}</td>
-                <td>{{ author.get_role_display }}{% if author.user == user %}
-                    <div class="float-sm-end">Это вы</div>{% else %}
-                    <a class="btn btn-outline-info float-sm-end" href="{% url 'translators_hub:change_role' slug=slug username=author.user.username %}">Сменить роль</a>{% endif %}</td>
-                <td>{{ author.user.userprofile.reputation }}</td>
-                <td>
-                    {% if author.user == user %}
-                        <hr>
-                    {% else %}
-                        <form class="form" method="post">
-                            {% csrf_token %}
-
-                            <button name="fired" value="{{ author.user_id }}" class="btn btn-warning" type="submit">
-                                Уволить
-                            </button>
-
-                        </form>
-                    {% endif %}
-                </td>
+                <td>Никнейм</td>
+                <td>Имя</td>
+                <td>Фамилия</td>
+                <td>Должность</td>
+                <td>Репутация</td>
+                <td></td>
             </tr>
-        {% endfor %}
-    </table>
+            {% for author in authors %}
+                <tr>
+                    <td><a class="btn btn-outline-info"
+                           href="{% url 'translators_hub:profile' slug=author.user.userprofile.slug %}">{{ author.user.username }}</a>
+                    </td>
+                    <td>{{ author.user.first_name }}</td>
+                    <td>{{ author.user.last_name }}</td>
+                    <td>{{ author.get_role_display }}{% if author.user == user %}
+                        <div class="float-sm-end">Это вы</div>{% else %}
+                        <a class="btn btn-outline-info float-sm-end"
+                           href="{% url 'translators_hub:change_role' slug=slug username=author.user.username %}">Сменить
+                            роль</a>{% endif %}</td>
+                    <td>{{ author.user.userprofile.reputation }}</td>
+                    <td>
+                        {% if author.user == user %}
+                            <hr>
+                        {% else %}
+                            <form class="form" method="post">
+                                {% csrf_token %}
+
+                                <button name="fired" value="{{ author.user_id }}" class="btn btn-warning" type="submit">
+                                    Уволить
+                                </button>
+
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock content %}
