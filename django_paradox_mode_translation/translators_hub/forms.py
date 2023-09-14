@@ -107,6 +107,38 @@ class AddPageForm(forms.ModelForm):
                   'target_language']
 
 
+class ChangeDescriptionForm(forms.ModelForm):
+    title = forms.CharField(
+        widget=forms.TextInput(attrs={
+
+        }),
+        label="Название"
+    )
+
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={
+            "cols": 100,
+            "rows": 15
+        }),
+        required=False,
+        label="Описание"
+    )
+
+    status = forms.ChoiceField(
+        choices=ModTranslation.STATUS,
+        widget=forms.Select(
+            attrs={
+
+            }
+        ),
+        label="Статус проекта"
+    )
+
+    class Meta:
+        model = ModTranslation
+        fields = ['title', 'description', 'status']
+
+
 class InviteUserForm(forms.ModelForm):
     role = forms.ChoiceField(
         choices=Roles.ROLES,
