@@ -11,7 +11,7 @@ from django.views import generic
 import translators_hub.models
 from . import models
 from .forms import UpdateProfileForm, RegistrationForm, AddPageForm, ServiceForm, ProfileFormForApply, InviteUserForm, \
-    UpdateUserForm, ChangeUserRoleForm
+    UpdateUserForm, ChangeUserRoleForm, ChangeDescriptionForm
 from .models import ModTranslation, UserProfile, ProfileComments, Roles, Invites, Game
 
 User = get_user_model()
@@ -93,6 +93,7 @@ class ManagementView(generic.View):
         project = ModTranslation.objects.get(slug=slug)
         project_authors = None
         project_moderator = None
+        description_form = ChangeDescriptionForm(instance=project)
         if not isinstance(request.user, AnonymousUser):
             project_authors = project.authors.all().prefetch_related('user', 'user__userprofile')
             project_moderator = project.authors.filter(role__in=[Roles.ORGANISER, Roles.MODERATOR],
@@ -102,6 +103,7 @@ class ManagementView(generic.View):
                 'slug': slug,
                 'user': request.user,
                 'authors': project_authors,
+                'form': description_form,
             }
             return render(request=request, template_name='translators_hub/project_management.html', context=context)
         else:
@@ -119,6 +121,10 @@ class ManagementView(generic.View):
             for author in fired_users:
                 project.authors.remove(author)
                 project.save()
+            return redirect('translators_hub:management', slug=slug)
+        elif request.POST.get('save_description'):
+            change_description_form = ChangeDescriptionForm(request.POST, request.FILES, instance=project)
+            change_description_form.save()
             return redirect('translators_hub:management', slug=slug)
         else:
             return redirect('translators_hub:management', slug=slug)
