@@ -43,13 +43,13 @@
                     <td>{{ author.user.first_name }}</td>
                     <td>{{ author.user.last_name }}</td>
                     <td>{{ author.get_role_display }}{% if author.user == user %}
-                        <div class="float-sm-end">Это вы</div>{% else %}
+                        <div class="float-sm-end">Это вы</div>{% elif author.role != 'org' %}
                         <a class="btn btn-outline-info float-sm-end"
                            href="{% url 'translators_hub:change_role' slug=slug username=author.user.username %}">Сменить
                             роль</a>{% endif %}</td>
                     <td>{{ author.user.userprofile.reputation }}</td>
                     <td>
-                        {% if author.user == user %}
+                        {% if author.user == user or author.role == 'org' %}
                             <hr>
                         {% else %}
                             <form class="form" method="post">
