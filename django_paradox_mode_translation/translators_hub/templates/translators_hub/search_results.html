@@ -9,15 +9,33 @@
         {% if search_results %}
             <ul class="list-group mt-4">
                 {% for result in search_results %}
-                    <li class="list-group-item">
-                        <h2><a href="{% url 'translators_hub:detail_page' slug=result.slug %}"
-                               class="text-primary">{{ result.title }}</a></h2>
-                        {% if result.description %}
-                            <p>{{ result.description | truncatechars:150 }}</p>
-                        {% else %}
-                            <p>No description available</p>
-                        {% endif %}
-                    </li>
+
+                    {% if result.model_name == 'modtranslation' %}
+                        <li class="list-group-item">
+
+                            <h2><a href="{% url 'translators_hub:detail_page' slug=result.slug %}"
+                                   class="text-primary">{{ result.title }}</a></h2>
+                            {% if result.description %}
+                                <p>{{ result.description | truncatechars:150 }}</p>
+                            {% else %}
+                                <p>No description available</p>
+
+                                </li>
+                            {% endif %}
+                    {% elif result.model_name == 'userprofile' %}
+                        {{ result.slug }}
+                        <li class="list-group-item">
+
+                            <h2><a href="{% url 'translators_hub:profile' slug=result.slug %}"
+                                   class="text-primary">{{ result.user.username }}</a></h2>
+                            {% if result.description %}
+                                <p>{{ result.description | truncatechars:150 }}</p>
+                            {% else %}
+                                <p>No description available</p>
+
+                                </li>
+                            {% endif %}
+                    {% endif %}
                 {% endfor %}
             </ul>
         {% else %}
