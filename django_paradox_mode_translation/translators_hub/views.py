@@ -1,6 +1,7 @@
 from django.contrib.auth import views, login, authenticate, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib import messages
+from django.contrib.postgres.search import SearchVector
 from django.db.models import Q
 from django.forms import model_to_dict, modelformset_factory
 from django.shortcuts import render, get_object_or_404, redirect
@@ -45,6 +46,31 @@ class HomeView(generic.ListView):
             'selected_game': selected_game
         }
         return super(HomeView, self).get(request, *args, **kwargs)
+
+
+class SearchProjectView(generic.ListView):
+    template_name = 'translators_hub/search_results.html'
+    context_object_name = 'search_results'
+    paginate_by = 5
+
+    def get_queryset(self):
+        search_query = self.extra_context.get('search_query')
+        if search_query:
+            search_vector = SearchVector('title', 'mode_name', 'description')
+            search_results = ModTranslation.objects.annotate(search=search_vector).filter(search=search_query)
+            self.extra_context['total_objects'] = search_results.count()
+            return search_results
+        else:
+            search_results = ModTranslation.objects.all()
+            self.extra_context['total_objects'] = search_results.count()
+            return search_results
+
+    def get(self, request, *args, **kwargs):
+        search_query = request.GET.get('search-query')
+        self.extra_context = {
+            'search_query': search_query,
+        }
+        return super(SearchProjectView, self).get(request, args, kwargs)
 
 
 class DetailView(generic.DetailView):
