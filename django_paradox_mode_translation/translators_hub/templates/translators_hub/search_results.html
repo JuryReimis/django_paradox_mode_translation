@@ -2,24 +2,26 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
-  <h1 class="mt-5">Search Results</h1>
-  <p class="lead">You searched for: "{{ search_query }}"</p>
-  {% if search_results %}
-  <ul class="list-group mt-4">
-    {% for result in search_results %}
-    <li class="list-group-item">
-      <h2><a href="{% url 'translators_hub:detail_page' slug=result.slug %}" class="text-primary">{{ result.title }}</a></h2>
-      {% if result.description %}
-      <p>{{ result.description | truncatechars:30 }}</p>
-      {% else %}
-      <p>No description available</p>
-      {% endif %}
-    </li>
-    {% endfor %}
-  </ul>
-  {% else %}
-  <p class="mt-4">No results found.</p>
-  {% endif %}
-</div>
+    <div class="container">
+        <h1 class="mt-5">Search Results</h1>
+        <p class="lead">You searched for: "{{ search_query }}"</p>
+        <p class="lead">Найдено результатов: {{ total_objects }}</p>
+        {% if search_results %}
+            <ul class="list-group mt-4">
+                {% for result in search_results %}
+                    <li class="list-group-item">
+                        <h2><a href="{% url 'translators_hub:detail_page' slug=result.slug %}"
+                               class="text-primary">{{ result.title }}</a></h2>
+                        {% if result.description %}
+                            <p>{{ result.description | truncatechars:150 }}</p>
+                        {% else %}
+                            <p>No description available</p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="mt-4">No results found.</p>
+        {% endif %}
+    </div>
 {% endblock %}
