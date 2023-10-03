@@ -2,12 +2,16 @@
 
 <nav class="navbar fixed-top navbar-dark bg-dark" aria-label="Dark offcanvas navbar">
     <div class="container-fluid">
-        <div class="col justify-content-start mh-100">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <a class="navbar-brand" href="{% url 'translators_hub:home' %}"><img style="max-height: 50px; max-width: 50px"
                     class="img-thumbnail rounded-circle"
                     src="{% static 'translators_hub/images/main icon.jpg' %}" alt="Лого сайта"></a>
             <a class="navbar-brand" href="{% url 'translators_hub:add_page' %}">Добавить страницу</a>
+
         </div>
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 navbar-toggler" action="{% url 'translators_hub:search_project' %}">
+            <input name="search-query" type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
+        </form>
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark"
                 aria-controls="offcanvasNavbarDark">
             {{ button_name }}
@@ -26,7 +30,7 @@
 
                         <li><a class="dropdown-item"
                                href="{% url 'translators_hub:my_projects' user_logged.slug %}">Мои
-                            проекты</a></li>
+                            проекты({{ active_projects|length }})</a></li>
                         <li><a class="dropdown-item"
                                href="{% url 'translators_hub:invites' user_logged.slug %}">Приглашения
                             ({{ active_invites|length }})</a>
