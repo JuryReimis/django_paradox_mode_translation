@@ -43,8 +43,11 @@
                                 <a href="{{ page.get_absolute_url }}"
                                    class="btn btn-sm btn-info text-white">Подробнее</a>
                             </div>
-                            <div class="col-4 d-flex justify-content-end d-lg-block">
+                            <div class="col-3 d-flex justify-content-end">
                                 <img src="" alt="">
+                                {% if page.steam_link %}<a href="{{ page.steam_link }}" class="btn btn-sm btn-outline-info">{{ page.mode_name }}</a>{% endif %}
+                                {% if page.paradox_plaza_link %}<a href="{{ page.paradox_plaza_link }}" class="btn btn-sm btn-outline-info">{{ page.mode_name }}</a>{% endif %}
+
                             </div>
                         </div>
                     </div>
