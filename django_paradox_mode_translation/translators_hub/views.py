@@ -1,3 +1,4 @@
+import django.core.paginator
 from django.contrib.auth import views, login, authenticate, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib import messages
@@ -30,7 +31,8 @@ class HomeView(generic.ListView):
 
     def get_queryset(self):
         if self.extra_filter:
-            return ModTranslation.objects.filter(game__in=self.extra_filter.get('selected_game')).order_by('-created_date')
+            return ModTranslation.objects.filter(game__in=self.extra_filter.get('selected_game')).order_by(
+                '-created_date')
         return ModTranslation.objects.order_by('-created_date')
 
     def get(self, request, *args, **kwargs):
@@ -54,19 +56,34 @@ class SearchProjectView(generic.ListView):
     paginate_by = 5
 
     def get_queryset(self):
+        def add_model_name(obj):
+            obj_name = obj._meta.model_name
+            obj.model_name = obj_name
+            return obj
         search_query = self.extra_context.get('search_query')
         if search_query:
-            search_vector = SearchVector('title', 'mode_name', 'description')
-            search_results = ModTranslation.objects.annotate(search=search_vector).filter(search=search_query)
-            self.extra_context['total_objects'] = search_results.count()
+            search_vector_for_projects = SearchVector('title', 'mode_name', 'description')
+            search_vector_for_users = SearchVector('user__username', 'user__first_name', 'user__last_name')
+            searched_projects = ModTranslation.objects.annotate(search=search_vector_for_projects).filter(
+                search=search_query)
+            searched_users = UserProfile.objects.annotate(search=search_vector_for_users).filter(
+                search=search_query)
+            search_results = list(map(add_model_name, list(searched_projects) + list(searched_users)))
+            self.extra_context['total_objects'] = len(search_results)
             return search_results
         else:
-            search_results = ModTranslation.objects.all()
-            self.extra_context['total_objects'] = search_results.count()
+            self.extra_context['search_query'] = '---'
+            search_results = list(map(add_model_name, list(ModTranslation.objects.all()) + list(UserProfile.objects.all())))
+            self.extra_context['total_objects'] = len(search_results)
             return search_results
+    
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(SearchProjectView, self).get_context_data(object_list=object_list, **kwargs)
+        paginator: django.core.paginator.Paginator = context['paginator']
+        return context
 
     def get(self, request, *args, **kwargs):
-        search_query = request.GET.get('search-query')
+        search_query = request.GET.get('search_query')
         self.extra_context = {
             'search_query': search_query,
         }
