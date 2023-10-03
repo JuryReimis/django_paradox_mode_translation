@@ -9,8 +9,8 @@
             <a class="navbar-brand" href="{% url 'translators_hub:add_page' %}">Добавить страницу</a>
 
         </div>
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 navbar-toggler" action="{% url 'translators_hub:search_project' %}">
-            <input name="search-query" type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 navbar-toggler" action="{% url 'translators_hub:search' %}">
+            <input name="search_query" type="search" class="form-control form-control-dark" placeholder="Поиск..." aria-label="Search">
         </form>
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarDark"
                 aria-controls="offcanvasNavbarDark">
