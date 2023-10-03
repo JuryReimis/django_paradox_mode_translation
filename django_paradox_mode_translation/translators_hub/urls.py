@@ -14,7 +14,7 @@ urlpatterns = [
     path('logout/', views.LogOutView.as_view(), name='logout'),
     path('registration/', views.RegistrationView.as_view(), name='registration'),
     path('add-page', views.AddPageView.as_view(), name='add_page'),
-    path('mods-translation/search/', views.SearchProjectView.as_view(), name='search_project'),
+    path('mods-translation/search/', views.SearchProjectView.as_view(), name='search'),
     path('mods-translations/<slug:slug>/', views.DetailView.as_view(), name='detail_page'),
     path('mods-translations/<slug:slug>/management/', views.ManagementView.as_view(), name='management'),
     path('mods-translations/<slug:slug>/management/change_role/username=<str:username>', views.ChangeRoleView.as_view(), name='change_role'),
