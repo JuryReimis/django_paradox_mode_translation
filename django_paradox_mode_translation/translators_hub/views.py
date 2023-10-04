@@ -15,6 +15,7 @@ from . import models
 from .forms import UpdateProfileForm, RegistrationForm, AddPageForm, ServiceForm, ProfileFormForApply, InviteUserForm, \
     UpdateUserForm, ChangeUserRoleForm, ChangeDescriptionForm
 from .models import ModTranslation, UserProfile, ProfileComments, Roles, Invites, Game
+from .utils.custom_paginator import CustomPaginator
 
 User = get_user_model()
 User: translators_hub.models.User
@@ -54,6 +55,7 @@ class SearchProjectView(generic.ListView):
     template_name = 'translators_hub/search_results.html'
     context_object_name = 'search_results'
     paginate_by = 5
+    paginator_class = CustomPaginator
 
     def get_queryset(self):
         def add_model_name(obj):
@@ -79,7 +81,11 @@ class SearchProjectView(generic.ListView):
     
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(SearchProjectView, self).get_context_data(object_list=object_list, **kwargs)
-        paginator: django.core.paginator.Paginator = context['paginator']
+        paginator: CustomPaginator = context['paginator']
+        if not paginator.get_custom_immutable_href():
+            name = 'search_query'
+            value = self.extra_context.get('search_query')
+            paginator.set_custom_immutable_href(href_name_value=((name, value),))
         return context
 
     def get(self, request, *args, **kwargs):
@@ -87,7 +93,7 @@ class SearchProjectView(generic.ListView):
         self.extra_context = {
             'search_query': search_query,
         }
-        return super(SearchProjectView, self).get(request, args, kwargs)
+        return super(SearchProjectView, self).get(request, *args, **kwargs)
 
 
 class DetailView(generic.DetailView):
@@ -124,9 +130,9 @@ class DetailView(generic.DetailView):
                 role_object = self.get_object().authors.get(user=request.user)
                 if role_object.role in [Roles.ORGANISER, Roles.MODERATOR]:
                     self.extra_context = {'moderator': True}
-            return super(DetailView, self).get(request, args, kwargs)
+            return super(DetailView, self).get(request, *args, **kwargs)
         except models.models.ObjectDoesNotExist:
-            return super(DetailView, self).get(request, args, kwargs)
+            return super(DetailView, self).get(request, *args, **kwargs)
 
 
 class ManagementView(generic.View):
@@ -278,7 +284,7 @@ class AddPageView(generic.FormView):
             messages.add_message(request=request, level=messages.ERROR, message=error_message)
             return redirect('translators_hub:home')
         else:
-            return super(AddPageView, self).get(args, kwargs)
+            return super(AddPageView, self).get(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -314,7 +320,7 @@ class MyProjectsView(generic.ListView):
         slug = kwargs.get('slug')
         user_slug = request.user.userprofile.slug
         if user_slug == slug:
-            super_method = super(MyProjectsView, self).get(request, args, kwargs)
+            super_method = super(MyProjectsView, self).get(request, *args, **kwargs)
             return super_method
         else:
             return redirect('translators_hub:my_projects', slug=user_slug)
@@ -352,7 +358,7 @@ class InvitesView(generic.ListView):
         slug = kwargs.get('slug')
         user_slug = request.user.userprofile.slug
         if user_slug == slug:
-            return super(InvitesView, self).get(request, args, kwargs)
+            return super(InvitesView, self).get(request, *args, **kwargs)
         else:
             return redirect('translators_hub:invites', slug=user_slug)
 
@@ -387,7 +393,7 @@ class SendInvitesView(generic.ListView):
     def get(self, request, *args, **kwargs):
         form = InviteUserForm()
         self.extra_context = {'form': form, 'slug': kwargs.get('slug')}
-        super_method = super(SendInvitesView, self).get(request, args, kwargs)
+        super_method = super(SendInvitesView, self).get(request, *args, **kwargs)
         moderators = [author.user if author.role in [Roles.ORGANISER, Roles.MODERATOR] else '' for author in
                       self.current_authors]
         if request.user not in moderators:
