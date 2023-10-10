@@ -1,4 +1,5 @@
 {% extends 'translators_hub/base.html' %}
+{% load static %}
 
 {% block messages %}
     {% if messages %}
@@ -18,9 +19,13 @@
                 <h5>Игры:</h5>
                 {% for game in games %}
                     {% if game in selected_game %}
-                        <li class="list-group-item bg-dark border-0"><span class="text-white" style="padding: 10px; border-radius: 50px; background-color: slategray" >{{ game }}</span></li>
+                        <li class="list-group-item bg-dark border-0"><span class="text-white"
+                                                                           style="padding: 10px; border-radius: 50px; background-color: slategray">{{ game }}</span>
+                        </li>
                     {% else %}
-                        <li class="nav-link list-group-item text-white"><a class="btn btn-secondary" href="{% url 'translators_hub:home' %}?game={{ game }}">{{ game }}</a></li>
+                        <li class="nav-link list-group-item text-white"><a class="btn btn-secondary"
+                                                                           href="{% url 'translators_hub:home' %}?game={{ game }}">{{ game }}</a>
+                        </li>
                     {% endif %}
                 {% endfor %}
             </ul>
@@ -33,21 +38,39 @@
                 {% for page in latest_pages_list %}
                     <div class="container">
                         <div class="row border p-4 p-md-5 mb-4 rounded text-bg-dark">
-                            <div class="col-8 px-0">
-                                <h1 class="display-4 fst-italic">{{ page.title|truncatechars:100 }}</h1>
-                                {% if page.description %}
-                                    <p class="lead my-3">{{ page.description|truncatechars:160 }}</p>
-                                {% else %}
-                                    <p class="lead my-3">Нет описания</p>
-                                {% endif %}
-                                <a href="{{ page.get_absolute_url }}"
-                                   class="btn btn-sm btn-info text-white">Подробнее</a>
+                            <div class="col-md-8">
+                                <div class="d-flex flex-column justify-content-between align-items-start h-100">
+                                    <!-- Внутри первой колонки -->
+                                    <div>
+                                        <h1 class="display-4 fst-italic">{{ page.title|truncatechars:100 }}</h1>
+                                        {% if page.description %}
+                                            <p class="lead my-3">{{ page.description|truncatechars:160 }}</p>
+                                        {% else %}
+                                            <p class="lead my-3">Нет описания</p>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ page.get_absolute_url }}"
+                                       class="btn btn-sm btn-info text-white mt-auto">Подробнее</a>
+                                    <!-- Кнопка "Подробнее" размещена внизу первой колонки -->
+                                </div>
                             </div>
-                            <div class="col-3 d-flex justify-content-end">
-                                <img src="" alt="">
-                                {% if page.steam_link %}<a href="{{ page.steam_link }}" class="btn btn-sm btn-outline-info">{{ page.mode_name }}</a>{% endif %}
-                                {% if page.paradox_plaza_link %}<a href="{{ page.paradox_plaza_link }}" class="btn btn-sm btn-outline-info">{{ page.mode_name }}</a>{% endif %}
-
+                            <div class="col-md-4 d-flex flex-column justify-content-between align-items-end">
+                                <!-- Внутри второй колонки -->
+                                <img src="{% static 'translators_hub/images/main icon.jpg' %}" alt="">
+                                <div class="d-flex flex-column align-items-center mt-3">
+                                    <!-- Добавлены классы для выравнивания элементов друг под другом -->
+                                    <span>Оригинальный мод: <b>{{ page.mode_name }}</b></span>
+                                    <div class="d-flex flex-row">
+                                        {% if page.steam_link %}
+                                            <a href="{{ page.steam_link }}"
+                                               class="btn btn-sm btn-outline-info m-2 fst-italic">Steam Workshop</a>
+                                        {% endif %}
+                                        {% if page.paradox_plaza_link %}
+                                            <a href="{{ page.paradox_plaza_link }}"
+                                               class="btn btn-sm btn-outline-info m-2 fst-italic">Paradox Plaza</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
