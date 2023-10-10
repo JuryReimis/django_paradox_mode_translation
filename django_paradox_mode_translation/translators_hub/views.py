@@ -25,6 +25,7 @@ class HomeView(generic.ListView):
     template_name = 'translators_hub/home.html'
     context_object_name = 'latest_pages_list'
     paginate_by = 4
+    paginator_class = CustomPaginator
 
     def __init__(self, *args, **kwargs):
         self.extra_filter = None
