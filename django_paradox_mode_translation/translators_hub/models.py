@@ -1,9 +1,5 @@
-import django.contrib.auth.models
 from django.db import models
-from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
-from django.utils.text import slugify
 from django.contrib.auth.models import AbstractUser
 
 from django.utils.translation import gettext_lazy as _
@@ -218,19 +214,14 @@ class ModTranslation(models.Model):
         return self.title
 
     def get_sorted_roles(self):
-        authors = self.authors.order_by('role')
+        authors = self.authors.order_by()
 
         order = {}
         for author in authors:
-            role_name = Invites.get_role_name(author.role)
+            role_name = author.get_role_display()
             order[role_name] = order.get(role_name, [])
             order[role_name].append(author.user)
         return order
-
-    def get_user_role(self, user: User):
-        author = self.authors.get(user=user)
-        role = author.role
-        return role
 
     class Meta:
         verbose_name = "Перевод"
@@ -272,6 +263,7 @@ class Roles(models.Model):
     class Meta:
         verbose_name = "Роль"
         verbose_name_plural = "Роли"
+        ordering = ['role']
 
 
 class Invites(models.Model):
@@ -321,13 +313,8 @@ class Invites(models.Model):
         default=None,
     )
 
-    @classmethod
-    def get_role_name(cls, role):
-        role = Invites(role=role)
-        return role.get_role_display()
-
     def __str__(self):
-        return f'Приглашение для {self.target}, на позицию {self.get_role_name(self.role)}'
+        return f'Приглашение для {self.target}, на позицию {self.get_role_display()}'
 
     class Meta:
         verbose_name = "Приглашение"
