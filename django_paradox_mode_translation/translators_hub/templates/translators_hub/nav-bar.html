@@ -26,7 +26,7 @@
                 <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                     {% if user_logged %}
                         <li><a class="dropdown-item"
-                               href="{% url 'translators_hub:profile' user_logged.slug %}">Профиль</a></li>
+                               href="{% url 'translators_hub:profile' user_logged.slug %}"><img src="/media/{{ user_logged.profile_image }}" alt="{{ user_logged.profile_image }}" class="profile-icon">Профиль</a></li>
 
                         <li><a class="dropdown-item"
                                href="{% url 'translators_hub:my_projects' user_logged.slug %}">Мои
