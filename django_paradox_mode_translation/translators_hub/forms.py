@@ -136,7 +136,7 @@ class ChangeDescriptionForm(forms.ModelForm):
 
     class Meta:
         model = ModTranslation
-        fields = ['title', 'description', 'status']
+        fields = ['title', 'image', 'description', 'status']
 
 
 class InviteUserForm(forms.ModelForm):
