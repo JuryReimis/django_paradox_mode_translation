@@ -75,7 +75,7 @@ class SearchProjectView(generic.ListView):
             self.extra_context['total_objects'] = len(search_results)
             return search_results
         else:
-            self.extra_context['search_query'] = '---'
+            self.extra_context['search_query'] = ''
             search_results = list(map(add_model_name, list(ModTranslation.objects.all()) + list(UserProfile.objects.all())))
             self.extra_context['total_objects'] = len(search_results)
             return search_results
@@ -174,7 +174,8 @@ class ManagementView(generic.View):
             return redirect('translators_hub:management', slug=slug)
         elif request.POST.get('save_description'):
             change_description_form = ChangeDescriptionForm(request.POST, request.FILES, instance=project)
-            change_description_form.save()
+            if change_description_form.is_valid():
+                change_description_form.save()
             return redirect('translators_hub:management', slug=slug)
         else:
             return redirect('translators_hub:management', slug=slug)
