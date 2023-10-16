@@ -12,7 +12,7 @@
                 </tr>
                 {% for user in free_users %}
                     <tr>
-                        <td>{{ user.username }}</td>
+                        <td><img src="/media/{{ user.userprofile.profile_image }}" class="profile-icon" alt="">{{ user.username }}</td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.userprofile.description }}</td>
                         <td>{% if user.userprofile.titles.all %}{{ user.userprofile.titles.all }}{% else %}
