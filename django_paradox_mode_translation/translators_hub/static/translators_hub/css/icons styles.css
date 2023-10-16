@@ -1,0 +1,17 @@
+
+
+.profile-icon {
+    height: 1.3em;
+    width: 1.3em;
+    margin-right: 0.5em;
+}
+
+.project-icon {
+    height: 4rem;
+    width: 4rem;
+    margin-left: 0.5em;
+}
+
+.card-icon {
+    height: 10rem;
+}
