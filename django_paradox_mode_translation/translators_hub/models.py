@@ -16,7 +16,7 @@ class User(AbstractUser):
 
 
 def get_image_user_path(instance, filename):
-    return f'users/{instance.user_id}/{filename}'
+    return f'users/{instance.slug}/{filename}'
 
 
 class UserProfile(models.Model):
@@ -71,6 +71,9 @@ class UserProfile(models.Model):
         verbose_name = "Профиль"
         verbose_name_plural = "Профили"
 
+    def get_absolute_url(self):
+        return reverse('translators_hub:profile', kwargs={'slug': self.slug})
+
     def get_fields_in_dict(self, ):
         fields_dict = {}
         for field in self._meta.fields:
@@ -78,8 +81,8 @@ class UserProfile(models.Model):
         return fields_dict
 
 
-def get_image_project_path(instance, file_name):
-    return f'/translators_hub/{instance.slug}/{file_name}'
+def get_image_project_path(instance, filename):
+    return f'translators_hub/{instance.slug}/{filename}'
 
 
 class ModTranslation(models.Model):
@@ -179,6 +182,7 @@ class ModTranslation(models.Model):
 
     image = models.ImageField(
         upload_to=get_image_project_path,
+        default='defaults/main icon.jpg',
         verbose_name="Обложка",
         blank=True,
         null=True
