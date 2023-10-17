@@ -176,7 +176,10 @@ class ManagementView(generic.View):
             change_description_form = ChangeDescriptionForm(request.POST, request.FILES, instance=project)
             if change_description_form.is_valid():
                 change_description_form.save()
-            return redirect('translators_hub:management', slug=slug)
+                messages.add_message(request, level=messages.SUCCESS, message='Успешно!')
+            else:
+                messages.add_message(request=request, level=messages.ERROR, message=change_description_form.errors)
+            return redirect('translators_hub:management', slug=slug,)
         else:
             return redirect('translators_hub:management', slug=slug)
 
