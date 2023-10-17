@@ -13,6 +13,11 @@
                                    href="{% url 'translators_hub:management' slug=current_page.slug %}">Управление
                     работой</a></p>
             {% endif %}
+            {% if current_page.image %}
+                <div class="text-center">
+                    <img src="{{ current_page.image.url }}" alt="Обложка проекта">
+                </div>
+            {% endif %}
             <h2>Описание:</h2>
             {% if current_page.description %}
                 <div class="text-center">{{ current_page.description }}</div>
@@ -41,12 +46,13 @@
             <h2>Ссылки:</h2>
             <ul class="list-group list-group-numbered">
                 {% if current_page.steam_link %}
-                <li class="py-4"><a class="btn btn-info list-group-item" href="{{ current_page.steam_link }}">Ссылка
-                    Стим</a></li>
+                    <li class="py-4"><a class="btn btn-info list-group-item" href="{{ current_page.steam_link }}">Ссылка
+                        Стим</a></li>
                 {% elif current_page.paradox_plaza_link %}
-                <li class="py-4"><a class="btn btn-info list-group-item" href="{{ current_page.paradox_plaza_link }}">Ссылка
-                    Paradox
-                    Plaza</a></li>
+                    <li class="py-4"><a class="btn btn-info list-group-item"
+                                        href="{{ current_page.paradox_plaza_link }}">Ссылка
+                        Paradox
+                        Plaza</a></li>
                 {% endif %}
             </ul>
             <div class="container justify-content-start"><a class="btn btn-success"
