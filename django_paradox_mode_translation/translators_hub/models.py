@@ -238,11 +238,11 @@ class Roles(models.Model):
     TRANSLATOR = 'trs'
     TESTER = 'tst'
     ROLES = [
-        (None, 'Никто'),
         (ORGANISER, 'Организатор'),
         (MODERATOR, 'Модератор'),
         (TRANSLATOR, 'Переводчик'),
         (TESTER, 'Тестер'),
+        (None, 'Никто'),
     ]
 
     user = models.ForeignKey(
