@@ -145,9 +145,8 @@ class ManagementView(generic.View):
         project_moderator = None
         description_form = ChangeDescriptionForm(instance=project)
         if not isinstance(request.user, AnonymousUser):
-            project_authors = project.authors.all().prefetch_related('user', 'user__userprofile')
-            project_moderator = project.authors.filter(role__in=[Roles.ORGANISER, Roles.MODERATOR],
-                                                       user=request.user)
+            project_authors = project.authors.order_by().prefetch_related('user', 'user__userprofile')
+            project_moderator = project.authors.filter(role__in=[Roles.ORGANISER, Roles.MODERATOR])
         if project_moderator:
             context = {
                 'slug': slug,
