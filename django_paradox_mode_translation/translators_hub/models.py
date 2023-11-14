@@ -358,19 +358,12 @@ class Titles(models.Model):
         verbose_name_plural = "Титулы"
 
 
-class ProfileComments(models.Model):
+class AbstractComments(models.Model):
     author = models.ForeignKey(
         to=User,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='comments'
-    )
-
-    target = models.ForeignKey(
-        to=UserProfile,
-        on_delete=models.CASCADE,
-        null=True,
-        related_name='comments_targets'
+        related_name='posted_comments'
     )
 
     comment_text = models.CharField(
@@ -381,20 +374,46 @@ class ProfileComments(models.Model):
         verbose_name="Комментарий",
     )
 
+    likes = models.IntegerField(
+        default=0,
+        blank=False,
+        null=False,
+    )
+
+    dislikes = models.IntegerField(
+        default=0,
+        blank=False,
+        null=False,
+    )
+
     pub_date = models.DateTimeField(
         verbose_name='Дата написания комментария',
         null=True,
+        auto_now_add=True,
     )
 
     update_date = models.DateTimeField(
         verbose_name='Дата изменения комментария',
         null=True,
-        blank=True
+        blank=True,
+        auto_now=True,
+    )
+
+    class Meta:
+        abstract = True
+
+
+class ProfileComments(AbstractComments):
+    target = models.ForeignKey(
+        to=UserProfile,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='profile_comments'
     )
 
     def __str__(self):
-        return f'Комментарий пользователя {self.author}'
+        return f'Комментарий пользователя {self.author} в профиле {self.target}'
 
     class Meta:
-        verbose_name = "Комментарий"
-        verbose_name_plural = "Комментарии"
+        verbose_name = "Комментарий в профиле"
+        verbose_name_plural = "Комментарии в профиле"
