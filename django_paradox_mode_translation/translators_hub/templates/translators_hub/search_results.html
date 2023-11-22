@@ -1,5 +1,6 @@
 {% extends 'translators_hub/base.html' %}
 {% load static %}
+{% load translators_hub_tags %}
 
 {% block content %}
     <div class="container">
@@ -80,4 +81,8 @@
             <p class="mt-4">No results found.</p>
         {% endif %}
     </div>
+{% endblock %}
+
+{% block pagination %}
+    {% get_pagination_block page_obj %}
 {% endblock %}
