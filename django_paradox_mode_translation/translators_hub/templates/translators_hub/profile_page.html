@@ -8,52 +8,53 @@
 
 {% block content %}
     <div class="container justify-content-center">
-        <form class="profile form" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% if form %}
-                <table class="table table-light table-bordered">
-                    {{ user_form }}
-                    {{ form }}
-                </table>
-                <p>Репутация: {{ profile_data.reputation }}</p>
-                <button class="btn btn-success" type="submit">Сохранить</button>
-                <button class="btn btn-warning" type="reset">Сбросить</button>
-            {% elif profile_data %}
-                <table class="table table-bordered table-light">
+        {% if update_button %}
+            <a class="btn btn-success" href="{% url 'translators_hub:update_profile' slug=slug %}">Изменить профиль</a>
+        {% endif %}
+        {% if profile_data %}
+            <table class="table table-bordered table-light">
                 <tr>
                     <th>{{ profile_data.user.username }}</th>
-                    <td><img src="/media/{{ profile_data.profile_image }}" alt="profile avatar" height="40" width="40"></td>
+                    <td><img src="/media/{{ profile_data.profile_image }}" alt="profile avatar" height="40" width="40">
+                    </td>
                 </tr>
-                    <tr>
-                        <th>Награды:</th>
-                        <td>{% if profile_data.titles.all %}{{ profile_data.titles.all }}{% else %}Нет наград{% endif %}</td>
-                    </tr>
-                    <tr>
-                        <th>Описание:</th>
-                        <td>{{ profile_data.description }}</td>
-                    </tr>
-                    <tr>
-                        <th>Опыт:</th>
-                        <td>{{ profile_data.experience }}</td>
-                    </tr>
-                    <tr>
-                        <th>Репутация:</th>
-                        <td>{{ profile_data.reputation }}</td>
-                    </tr>
+                <tr>
+                    <th>Награды:</th>
+                    <td>{% if profile_data.titles.all %}{{ profile_data.titles.all }}{% else %}Нетнаград{% endif %}</td>
+                </tr>
+                <tr>
+                    <th>Описание:</th>
+                    <td>{{ profile_data.description }}</td>
+                </tr>
+                <tr>
+                    <th>Опыт:</th>
+                    <td>{{ profile_data.experience }}</td>
+                </tr>
+                <tr>
+                    <th>Репутация:</th>
+                    <td>{{ profile_data.reputation }}</td>
+                </tr>
+            </table>
+        {% endif %}
+        {% if comment_form %}
+            comment
+            <form method="post">
+                {% csrf_token %}
+                <table>
+                    {{ comment_form }}
                 </table>
-            {% endif %}
-            <ul>
-                {% for comment in comments %}
-                    <li>
-                        <div>
-                            {{ comment.author }}
-                            {{ comment.comment_text }}
-                            <button>Удалить</button>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-
-        </form>
+            </form>
+        {% endif %}
+        <ul>
+            {% for comment in comments %}
+                <li>
+                    <div>
+                        {{ comment.author }}
+                        {{ comment.comment_text }}
+                        <button>Удалить</button>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
     </div>
 {% endblock %}
