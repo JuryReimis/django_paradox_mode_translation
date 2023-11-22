@@ -221,10 +221,12 @@ class ProfileView(AddCommentMixin, generic.DetailView ):
             return redirect(request.META.get('HTTP_REFERER') if request.META.get('HTTP_REFERER') else reverse('translators_hub:home'))
         else:
             self.extra_context = {
-                'slug': slug
+                'slug': slug,
+                'delete_root': False
             }
             if request.user.userprofile.slug == slug:
                 self.extra_context['update_button'] = True
+                self.extra_context['delete_root'] = True
             return super(ProfileView, self).get(request, *args, **kwargs)
 
 
