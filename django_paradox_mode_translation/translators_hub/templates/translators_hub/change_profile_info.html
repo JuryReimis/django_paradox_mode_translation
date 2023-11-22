@@ -1,0 +1,18 @@
+{% extends 'translators_hub/base.html' %}
+
+
+{% block content %}
+    <div class="container justify-content-center">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form %}
+                <table class="table table-light table-bordered">
+                    {{ form }}
+                </table>
+                <p>Репутация: {{ profile_data.reputation }}</p>
+                <button class="btn btn-success" type="submit">Сохранить</button>
+                <button class="btn btn-warning" type="reset">Сбросить</button>
+            {% endif %}
+        </form>
+    </div>
+{% endblock %}
