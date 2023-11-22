@@ -12,8 +12,8 @@ from django.views import generic
 
 import translators_hub.models
 from . import models
-from .forms import UpdateProfileForm, RegistrationForm, AddPageForm, ServiceForm, ProfileFormForApply, InviteUserForm, \
-    UpdateUserForm, ChangeUserRoleForm, ChangeDescriptionForm
+from .forms import UpdateProfileForm, RegistrationForm, AddPageForm, ServiceForm, ProfileFormForApply, InviteUserForm, ChangeUserRoleForm, ChangeDescriptionForm
+from .mixins import AddCommentMixin
 from .models import ModTranslation, UserProfile, ProfileComments, Roles, Invites, Game
 from .utils.custom_paginator import CustomPaginator
 
@@ -203,7 +203,7 @@ class ChangeRoleView(generic.edit.FormView):
         return redirect('translators_hub:management', slug=kwargs.get('slug'))
 
 
-class ProfileView(generic.DetailView):
+class ProfileView(AddCommentMixin, generic.DetailView ):
     template_name = 'translators_hub/profile_page.html'
     context_object_name = 'profile_data'
 
@@ -214,6 +214,7 @@ class ProfileView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         slug = request.resolver_match.kwargs.get('slug')
+        self.get_comment_form()
         if isinstance(request.user, AnonymousUser):
             error_message = "Для просмотра профилей наших пользователей - авторизуйтесь!"
             messages.add_message(request=request, level=messages.ERROR, message=error_message)
