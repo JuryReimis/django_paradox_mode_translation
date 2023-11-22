@@ -1,11 +1,11 @@
 {% extends 'translators_hub/base.html' %}
 
 {% load static %}
+{% load translators_hub_tags %}
 
 {% block head %}
     <link type="text/css" href="{% static 'translators_hub/css/form_styles.css' %}" rel="stylesheet">
 {% endblock %}
-
 {% block content %}
     <div class="container justify-content-center">
         {% if update_button %}
@@ -36,17 +36,22 @@
                 </tr>
             </table>
         {% endif %}
-        {% if comment_form %}
-            comment
+    </div>
+{% endblock %}
+
+{% block comments %}
+    {% if comment_form %}
             <form method="post">
                 {% csrf_token %}
                 <table>
                     {{ comment_form }}
                 </table>
             </form>
-        {% endif %}
+    {% endif %}
+    {% get_comments profile_data as page_obj %}
+    {% if page_obj %}
         <ul>
-            {% for comment in comments %}
+            {% for comment in page_obj.object_list %}
                 <li>
                     <div>
                         {{ comment.author }}
@@ -56,5 +61,6 @@
                 </li>
             {% endfor %}
         </ul>
-    </div>
+        {% get_pagination_block page_obj %}
+    {% endif %}
 {% endblock %}
