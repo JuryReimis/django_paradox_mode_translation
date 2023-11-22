@@ -1,5 +1,6 @@
 {% extends 'translators_hub/base.html' %}
 {% load static %}
+{% load translators_hub_tags %}
 
 {% block messages %}
     {% if messages %}
@@ -80,4 +81,8 @@
             {% endif %}
         </div>
     </div>
+{% endblock %}
+
+{% block pagination %}
+    {% get_pagination_block page_obj %}
 {% endblock %}
