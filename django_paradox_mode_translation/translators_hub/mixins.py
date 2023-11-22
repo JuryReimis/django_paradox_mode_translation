@@ -1,8 +1,8 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views import generic
 
 from translators_hub.forms import AddProfileCommentForm
-from translators_hub.models import UserProfile
+from translators_hub.models import UserProfile, ProfileComments
 
 
 class AddCommentMixin(generic.edit.ModelFormMixin):
@@ -24,9 +24,16 @@ class AddCommentMixin(generic.edit.ModelFormMixin):
 
     def post(self, request, *args, **kwargs):
         self.get_comment_form()
-        form: AddProfileCommentForm = self.get_form()
-        form.instance.target = self.target
-        form.instance.author = self.request.user
-        form.save()
+        delete_id = request.POST.get('comment_id')
+        if delete_id:
+            current_object = self.get_object()
+            if isinstance(current_object, UserProfile):
+                comment = get_object_or_404(ProfileComments, pk=delete_id)
+                comment.delete()
+        else:
+            form: AddProfileCommentForm = self.get_form()
+            form.instance.target = self.target
+            form.instance.author = request.user
+            form.save()
 
         return redirect(self.get_object().get_absolute_url())
