@@ -1,0 +1,29 @@
+<ul class="pagination justify-content-center fixed-bottom">
+    {% if page_obj.has_other_pages %}
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link"
+                   href="{{ page_obj.get_previous_page_custom_href }}"><<</a>
+            </li>
+
+        {% endif %}
+        {% for page_num, custom_href in page_obj.paginator.get_page_range_with_custom_href %}
+            {% if page_num == page_obj.number %}
+                <li class="page-item active"><span
+                        class="page-link">Страница {{ page_obj.number }}</span>
+                </li>
+            {% elif page_num|add:4 >= page_obj.number and page_num|add:-4 <= page_obj.number %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ custom_href }}">{{ page_num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link"
+                   href="{{ page_obj.get_next_page_custom_href }}">>></a>
+
+            </li>
+        {% endif %}
+    {% endif %}
+</ul>
