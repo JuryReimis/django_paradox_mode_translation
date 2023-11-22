@@ -203,53 +203,59 @@ class ChangeRoleView(generic.edit.FormView):
         return redirect('translators_hub:management', slug=kwargs.get('slug'))
 
 
-class ProfileView(generic.edit.FormMixin, generic.DetailView):
-    model = UserProfile
+class ProfileView(generic.DetailView):
     template_name = 'translators_hub/profile_page.html'
     context_object_name = 'profile_data'
-    form_class = UpdateProfileForm
-    success_url = None
+
+    def get_queryset(self):
+        slug = self.request.resolver_match.kwargs.get('slug')
+        profile = UserProfile.objects.select_related().filter(slug=slug)
+        return profile
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
+        slug = request.resolver_match.kwargs.get('slug')
         if isinstance(request.user, AnonymousUser):
             error_message = "Для просмотра профилей наших пользователей - авторизуйтесь!"
             messages.add_message(request=request, level=messages.ERROR, message=error_message)
-            return redirect('translators_hub:home')
-        if request.user.userprofile == self.object:
-            self.initial = model_to_dict(self.object)
-            user_form = UpdateUserForm(data=request.POST if request.POST != {} else None,
-                                       initial=model_to_dict(request.user))
-            self.extra_context = {'user_form': user_form}
-            context = self.get_context_data(object=self.object)
-            return self.render_to_response(context)
+            return redirect(request.META.get('HTTP_REFERER') if request.META.get('HTTP_REFERER') else reverse('translators_hub:home'))
         else:
-            context = {
-                'profile_data': self.object,
+            self.extra_context = {
+                'slug': slug
             }
-            return render(request=request, template_name='translators_hub/profile_page.html', context=context)
+            if request.user.userprofile.slug == slug:
+                self.extra_context['update_button'] = True
+            return super(ProfileView, self).get(request, *args, **kwargs)
+
+
+class UpdateProfileView(generic.UpdateView):
+    form_class = UpdateProfileForm
+    template_name = 'translators_hub/change_profile_info.html'
+    context_object_name = 'profile_data'
+
+    def get_queryset(self):
+        slug = self.request.resolver_match.kwargs.get('slug')
+        profile_data = UserProfile.objects.filter(slug=slug)
+        return profile_data
+
+    def get(self, request, *args, **kwargs):
+        slug = self.request.resolver_match.kwargs.get('slug')
+        if request.user.userprofile.slug == slug:
+            self.extra_context = {
+                'slug': slug,
+            }
+            return super(UpdateProfileView, self).get(request, *args, **kwargs)
+        else:
+            error = "У вас нет прав на редактирование чужого профиля!"
+            messages.add_message(request, level=messages.ERROR, message=error)
+            url = request.META.get('HTTP_REFERER')
+            if request.META.get('HTTP_REFERER'):
+                return redirect(url)
+            else:
+                return redirect(reverse('translators_hub:profile', kwargs={'slug': slug}))
 
     def post(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            user_profile = request.user.userprofile
-            self.success_url = reverse_lazy('translators_hub:profile', kwargs={'slug': kwargs['slug']})
-            self.kwargs['instance'] = user_profile
-            form = self.get_form()
-            user_form = UpdateUserForm(request.POST, request.FILES, instance=request.user)
-
-            if form.is_valid() and user_form.is_valid():
-                form.save(commit=True)
-                user_form.save()
-                return redirect(self.success_url)
-            else:
-                return self.get(request=request, form_errors=user_form.errors, *args, **kwargs)
-
-    def get_form_kwargs(self):
-        kwargs = super(ProfileView, self).get_form_kwargs()
-        instance = self.kwargs.get('instance')
-        if instance:
-            kwargs.update({'instance': instance})
-        return kwargs
+        self.success_url = reverse_lazy('translators_hub:profile', kwargs={'slug': request.resolver_match.kwargs.get('slug')})
+        return super(UpdateProfileView, self).post(request, *args, **kwargs)
 
 
 class LogInView(views.LoginView):
