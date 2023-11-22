@@ -8,6 +8,7 @@ app_name = 'translators_hub'
 urlpatterns = [
     path('home/', views.HomeView.as_view(), name='home'),
     path('profile/<slug:slug>/', views.ProfileView.as_view(), name='profile'),
+    path('profile/<slug:slug>/update-profile', views.UpdateProfileView.as_view(), name='update_profile'),
     path('profile/<slug:slug>/invites', views.InvitesView.as_view(), name='invites'),
     path('profile/<slug:slug>/my_projects', views.MyProjectsView.as_view(), name='my_projects'),
     path('login/', views.LogInView.as_view(), name='login'),
