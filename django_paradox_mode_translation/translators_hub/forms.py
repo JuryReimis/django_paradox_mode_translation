@@ -2,9 +2,10 @@ import requests
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
-from django.forms.utils import ErrorList
 
-from translators_hub.models import UserProfile, ModTranslation, Invites, Roles, Game, Titles
+
+from translators_hub.models import UserProfile, ModTranslation, Invites, Roles, Game, Titles, AbstractComments, \
+    ProfileComments
 
 User = get_user_model()
 
@@ -34,6 +35,12 @@ class UpdateProfileForm(forms.ModelForm):
     def change_initial_value(self, new_initial_value: dict):
         initial_dict = self.initial
         self.initial = initial_dict | new_initial_value
+
+
+class AddProfileCommentForm(forms.ModelForm):
+    class Meta:
+        model = ProfileComments
+        fields = ['comment_text']
 
 
 class ProfileFormForApply(UpdateProfileForm):
