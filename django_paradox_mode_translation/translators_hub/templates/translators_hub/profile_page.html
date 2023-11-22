@@ -40,6 +40,7 @@
 {% endblock %}
 
 {% block comments %}
+    <div class="container justify-content-center">
     {% if comment_form %}
             <form method="post">
                 {% csrf_token %}
@@ -56,11 +57,19 @@
                     <div>
                         {{ comment.author }}
                         {{ comment.comment_text }}
-                        <button>Удалить</button>
+                        {{ comment.pub_date }}
+                        {% if delete_root %}
+                            <form method="post" name="delete" >
+                                {% csrf_token %}
+                                <input class="button" type="hidden" name="comment_id" value="{{ comment.pk }}">
+                                <button class="button btn btn-warning" type="submit">Удалить</button>
+                            </form>
+                        {% endif %}
                     </div>
                 </li>
             {% endfor %}
         </ul>
         {% get_pagination_block page_obj %}
     {% endif %}
+    </div>
 {% endblock %}
