@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
 from django.views import generic
 
@@ -29,7 +30,15 @@ class AddCommentMixin(generic.edit.ModelFormMixin):
             current_object = self.get_object()
             if isinstance(current_object, UserProfile):
                 comment = get_object_or_404(ProfileComments, pk=delete_id)
-                comment.delete()
+                comment.visible = False
+                try:
+                    comment.save()
+                except Exception as error:
+                    error_text = f'Ошибка удаления\n{error}'
+                    messages.add_message(request, level=messages.ERROR, message=error_text)
+                else:
+                    message_text = "Комментарий удален!"
+                    messages.add_message(request, level=messages.SUCCESS, message=message_text)
         else:
             form: AddProfileCommentForm = self.get_form()
             form.instance.target = self.target
