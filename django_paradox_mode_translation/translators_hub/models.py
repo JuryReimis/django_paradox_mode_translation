@@ -399,6 +399,13 @@ class AbstractComments(models.Model):
         auto_now=True,
     )
 
+    visible = models.BooleanField(
+        verbose_name='Отображаемый',
+        default=True,
+        blank=False,
+        null=False,
+    )
+
     class Meta:
         abstract = True
 
