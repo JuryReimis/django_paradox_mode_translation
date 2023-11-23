@@ -40,7 +40,7 @@ def get_role_display(role):
 def get_comments(context, target):
     object_list = []
     if isinstance(target, UserProfile):
-        object_list = ProfileComments.objects.filter(target=target).order_by('pub_date')
+        object_list = ProfileComments.objects.filter(target=target, visible=True).order_by('-pub_date')
 
     if object_list:
         paginator = CustomPaginator(object_list, per_page=5)
