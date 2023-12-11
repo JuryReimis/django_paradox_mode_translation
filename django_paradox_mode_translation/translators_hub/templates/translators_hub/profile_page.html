@@ -5,6 +5,8 @@
 
 {% block head %}
     <link type="text/css" href="{% static 'translators_hub/css/form_styles.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="{% static 'translators_hub/js/jQuery/jQuery.js' %}"></script>
+    <script src="{% static 'translators_hub/js/commentaryFunctions.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="container justify-content-center">
@@ -40,36 +42,64 @@
 {% endblock %}
 
 {% block comments %}
-    <div class="container justify-content-center">
-    {% if comment_form %}
-            <form method="post">
+    <div class="container border-3 justify-content-center">
+        {% if comment_form %}
+            <form method="post" class="p-3">
                 {% csrf_token %}
-                <table>
+                <table class="table table-borderless">
                     {{ comment_form }}
                 </table>
+                <div class="container text text-end">
+                    <button class="btn btn-success" type="submit">Отправить</button>
+                </div>
             </form>
-    {% endif %}
-    {% get_comments profile_data as page_obj %}
-    {% if page_obj %}
-        <ul>
-            {% for comment in page_obj.object_list %}
-                <li>
-                    <div>
-                        {{ comment.author }}
-                        {{ comment.comment_text }}
-                        {{ comment.pub_date }}
-                        {% if delete_root %}
-                            <form method="post" name="delete" >
-                                {% csrf_token %}
-                                <input class="button" type="hidden" name="comment_id" value="{{ comment.pk }}">
-                                <button class="button btn btn-warning" type="submit">Удалить</button>
-                            </form>
-                        {% endif %}
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-        {% get_pagination_block page_obj %}
-    {% endif %}
+        {% endif %}
+        {% get_comments profile_data as page_obj %}
+        {% if page_obj %}
+            <ul class="list-group">
+                {% for comment in page_obj.object_list %}
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="comment-container col"
+                                 style="background-color: #eee; padding: 10px; margin-bottom: 10px; position: relative;">
+                                <div class="author-date-container"
+                                     style="display: flex; justify-content: space-between; align-items: center;">
+                                    <a style="margin: 0;" href="{{ comment.author.get_absolute_url }}"><strong>{{ comment.author }}</strong></a>
+                                    <p style="margin: 0; color: #888;">{{ comment.pub_date }}</p>
+                                </div>
+
+                                <p style="margin: 10px 0; padding-right: 60px;">{{ comment.comment_text }}</p>
+
+                                <div class="comment-buttons"
+                                     style="position: absolute; bottom: 5px; right: 5px; display: flex; gap: 5px;">
+                                    <div>
+                                        <span>{{ comment.likes }}</span>
+                                    </div>
+                                    <button type="button" class="btn btn-success btn-sm rounded-circle"
+                                            onclick="likeComment({{ comment.pk }})">👍
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm rounded-circle"
+                                            onclick="dislikeComment({{ comment.pk }})">👎
+                                    </button>
+                                </div>
+                            </div>
+                            {% if delete_root %}
+                                <div class="col col-sm-auto">
+                                        <form method="post" name="delete">
+                                            {% csrf_token %}
+                                            <input class="button" type="hidden" name="comment_id"
+                                                   value="{{ comment.pk }}">
+                                            <button type="submit" class="btn btn-danger btn-sm rounded-circle">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% get_pagination_block page_obj %}
+        {% endif %}
     </div>
 {% endblock %}
