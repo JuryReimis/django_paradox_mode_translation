@@ -4,8 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
 
 
-from translators_hub.models import UserProfile, ModTranslation, Invites, Roles, Game, Titles, AbstractComments, \
-    ProfileComments
+from translators_hub.models import UserProfile, ModTranslation, Invites, Roles, Game, ProfileComments
 
 User = get_user_model()
 
@@ -38,6 +37,14 @@ class UpdateProfileForm(forms.ModelForm):
 
 
 class AddProfileCommentForm(forms.ModelForm):
+    comment_text = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 5,
+            'cols': 60,
+        }),
+        label="Новый комментарий"
+    )
+
     class Meta:
         model = ProfileComments
         fields = ['comment_text']
