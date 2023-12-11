@@ -3,6 +3,7 @@
 
 {% block head %}
     <link type="text/css" href="{% static 'translators_hub/css/detail_page_styles.css' %}" rel="stylesheet">
+    <link type="text/css" href="{% static 'translators_hub/css/form_styles.css' %}" rel="stylesheet">
 {% endblock head %}
 
 {% block content %}
@@ -10,30 +11,30 @@
         <div class="row">
             {% if moderator %}
                 <p class="py-3"><a class="btn btn-dark"
-                                   href="{% url 'translators_hub:management' slug=current_page.slug %}">Управление
+                                   href="{% url 'translators_hub:management' slug=page_data.slug %}">Управление
                     работой</a></p>
             {% endif %}
-            {% if current_page.image %}
+            {% if page_data.image %}
                 <div class="text-center">
-                    <img src="{{ current_page.image.url }}" alt="Обложка проекта">
+                    <img src="{{ page_data.image.url }}" alt="Обложка проекта">
                 </div>
             {% endif %}
             <h2>Описание:</h2>
-            {% if current_page.description %}
-                <div class="text-center">{{ current_page.description }}</div>
+            {% if page_data.description %}
+                <div class="text-center">{{ page_data.description }}</div>
             {% else %}
                 <p>----</p>
             {% endif %}
             <hr>
             <h2>Авторы:</h2>
-            {% for role, authors in current_page.get_sorted_roles.items %}
+            {% for role, authors in page_data.get_sorted_roles.items %}
                 <div class="px-3"><h5>{{ role }}:</h5></div>
                 <div class="px-5">
                     <ul class="list-group">
                         <li class="list-group-item">
                             {% for author in authors %}
                                 <div class="list-group-item borderless"><a class="btn btn-outline-info"
-                                                                           href="{{ author.get_absolute_url }}">{{ author.first_name }}
+                                                                           href="{{ author.userprofile.get_absolute_url }}">{{ author.first_name }}
                                     {{ author.last_name }}{% if author.first_name or author.last_name %}
                                         ( {% endif %}{{ author.username }}{% if author.first_name or author.last_name %}
                                         ){% endif %}</a></div>
@@ -45,19 +46,23 @@
 
             <h2>Ссылки:</h2>
             <ul class="list-group list-group-numbered">
-                {% if current_page.steam_link %}
-                    <li class="py-4"><a class="btn btn-info list-group-item" href="{{ current_page.steam_link }}">Ссылка
+                {% if page_data.steam_link %}
+                    <li class="py-4"><a class="btn btn-info list-group-item" href="{{ page_data.steam_link }}">Ссылка
                         Стим</a></li>
-                {% elif current_page.paradox_plaza_link %}
+                {% elif page_data.paradox_plaza_link %}
                     <li class="py-4"><a class="btn btn-info list-group-item"
-                                        href="{{ current_page.paradox_plaza_link }}">Ссылка
+                                        href="{{ page_data.paradox_plaza_link }}">Ссылка
                         Paradox
                         Plaza</a></li>
                 {% endif %}
             </ul>
             <div class="container justify-content-start"><a class="btn btn-success"
-                                                            href="{% url 'translators_hub:apply_for' slug=current_page.slug %}">
+                                                            href="{% url 'translators_hub:apply_for' slug=page_data.slug %}">
                 Подать заявку на участие</a></div>
         </div>
     </div>
+{% endblock %}
+
+{% block comments %}
+    {% include 'translators_hub/comments_block.html' %}
 {% endblock %}
