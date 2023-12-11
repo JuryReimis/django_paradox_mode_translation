@@ -97,41 +97,23 @@ class SearchProjectView(generic.ListView):
         return super(SearchProjectView, self).get(request, *args, **kwargs)
 
 
-class DetailView(generic.DetailView):
+class DetailView(AddCommentMixin, generic.DetailView):
     model = ModTranslation
     template_name = 'translators_hub/detail_page.html'
-    context_object_name = 'current_page'
-
-    def post(self, request, slug, *args, **kwargs):
-        current_page = self.get_object()
-        if not request.user.is_authenticated:
-            form = ServiceForm()
-            error_message = "Необходимо авторизоваться"
-            messages.add_message(request=request, level=messages.ERROR, message=error_message)
-            context = {
-                'form': form,
-                'current_page': current_page,
-            }
-            return render(request=request, template_name='translators_hub/detail_page.html', context=context)
-        elif current_page.authors.filter(user=request.user):
-            form = ServiceForm()
-            error_message = "Вы уже являетесь членом команды!"
-            messages.add_message(request=request, level=messages.ERROR, message=error_message)
-            context = {
-                'form': form,
-                'current_page': current_page,
-            }
-            return render(request=request, template_name='translators_hub/detail_page.html', context=context)
-        else:
-            return redirect(reverse_lazy('translators_hub:apply_for', kwargs={'slug': slug}))
+    context_object_name = 'page_data'
 
     def get(self, request, *args, **kwargs):
+        self.extra_context = {}
         try:
+            self.get_comment_form()
+            self.object = self.get_object()
             if not isinstance(request.user, AnonymousUser):
-                role_object = self.get_object().authors.get(user=request.user)
+                role_object = self.object.authors.get(user=request.user)
                 if role_object.role in [Roles.ORGANISER, Roles.MODERATOR]:
-                    self.extra_context = {'moderator': True}
-            return super(DetailView, self).get(request, *args, **kwargs)
+                    self.extra_context['moderator'] = True
+                    self.extra_context['delete_root'] = True
+            context = self.get_context_data(object=self.object)
+            return self.render_to_response(context)
         except models.models.ObjectDoesNotExist:
             return super(DetailView, self).get(request, *args, **kwargs)
 
@@ -203,9 +185,9 @@ class ChangeRoleView(generic.edit.FormView):
         return redirect('translators_hub:management', slug=kwargs.get('slug'))
 
 
-class ProfileView(AddCommentMixin, generic.DetailView ):
+class ProfileView(AddCommentMixin, generic.DetailView):
     template_name = 'translators_hub/profile_page.html'
-    context_object_name = 'profile_data'
+    context_object_name = 'page_data'
 
     def get_queryset(self):
         slug = self.request.resolver_match.kwargs.get('slug')
