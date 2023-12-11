@@ -3,8 +3,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
 
-
-from translators_hub.models import UserProfile, ModTranslation, Invites, Roles, Game, ProfileComments
+from translators_hub.models import UserProfile, ModTranslation, Invites, Roles, Game, ProfileComments, ProjectComments
 
 User = get_user_model()
 
@@ -122,6 +121,20 @@ class AddPageForm(forms.ModelForm):
                   'target_language']
 
 
+class AddProjectCommentForm(forms.ModelForm):
+    comment_text = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'rows': 5,
+            'cols': 60,
+        }),
+        label="Новый комментарий"
+    )
+
+    class Meta:
+        model = ProjectComments
+        fields = ['comment_text']
+
+
 class ChangeDescriptionForm(forms.ModelForm):
     title = forms.CharField(
         widget=forms.TextInput(attrs={
@@ -208,7 +221,6 @@ class InviteUserForm(forms.ModelForm):
 
 
 class ChangeUserRoleForm(forms.ModelForm):
-
     role = forms.ChoiceField(
         widget=forms.Select(attrs={
             'class': 'form-select form-select-sm'
