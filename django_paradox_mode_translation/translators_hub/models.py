@@ -11,9 +11,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-    def get_absolute_url(self):
-        return reverse('translators_hub:profile', kwargs={'slug': self.userprofile.slug})
-
 
 def get_image_user_path(instance, filename):
     return f'users/{instance.slug}/{filename}'
@@ -218,7 +215,7 @@ class ModTranslation(models.Model):
         return self.title
 
     def get_sorted_roles(self):
-        authors = self.authors.order_by()
+        authors = self.authors.order_by().select_related('user__userprofile')
 
         order = {}
         for author in authors:
@@ -411,6 +408,13 @@ class AbstractComments(models.Model):
 
 
 class ProfileComments(AbstractComments):
+    author = models.ForeignKey(
+        to=User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='posted_profile_comments'
+    )
+
     target = models.ForeignKey(
         to=UserProfile,
         on_delete=models.CASCADE,
@@ -424,3 +428,26 @@ class ProfileComments(AbstractComments):
     class Meta:
         verbose_name = "Комментарий в профиле"
         verbose_name_plural = "Комментарии в профиле"
+
+
+class ProjectComments(AbstractComments):
+    author = models.ForeignKey(
+        to=User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='posted_project_comments'
+    )
+
+    target = models.ForeignKey(
+        to=ModTranslation,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='project_comments',
+    )
+
+    def __str__(self):
+        return f'Комментарий пользователя {self.author} под проектом {self.target}'
+
+    class Meta:
+        verbose_name = "Комментарий под проектом"
+        verbose_name_plural = "Комментарии под проектом"
