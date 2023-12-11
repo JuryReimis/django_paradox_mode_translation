@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AnonymousUser
 from django.template import Library
 
-from translators_hub.models import Invites, ProfileComments, UserProfile
+from translators_hub.models import Invites, ProfileComments, UserProfile, ModTranslation, ProjectComments
 from translators_hub.utils.custom_paginator import CustomPaginator
 
 register = Library()
@@ -41,7 +41,8 @@ def get_comments(context, target):
     object_list = []
     if isinstance(target, UserProfile):
         object_list = ProfileComments.objects.filter(target=target, visible=True).order_by('-pub_date')
-
+    elif isinstance(target, ModTranslation):
+        object_list = ProjectComments.objects.filter(target=target, visible=True).order_by('-pub_date')
     if object_list:
         paginator = CustomPaginator(object_list, per_page=5)
     else:
