@@ -4,16 +4,28 @@
 {% block head %}
     <link type="text/css" href="{% static 'translators_hub/css/detail_page_styles.css' %}" rel="stylesheet">
     <link type="text/css" href="{% static 'translators_hub/css/form_styles.css' %}" rel="stylesheet">
+
+    <script type="text/javascript" src="{% static 'translators_hub/js/jQuery/jQuery.js' %}"></script>
+    <script type="text/javascript" src="{% static 'translators_hub/js/jsCookies/js.cookie.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'translators_hub/js/commentaryFunctions.js' %}"></script>
 {% endblock head %}
 
 {% block content %}
     <div class="container">
         <div class="row">
+            <div class="col justify-content-start">
             {% if moderator %}
                 <p class="py-3"><a class="btn btn-dark"
                                    href="{% url 'translators_hub:management' slug=page_data.slug %}">Управление
                     работой</a></p>
             {% endif %}
+            </div>
+            <div class="col text text-end">
+                <p class="py-3">
+                <a class="btn btn-success"
+                                                            href="{% url 'translators_hub:apply_for' slug=page_data.slug %}">
+                Подать заявку на участие</a></p>
+            </div>
             {% if page_data.image %}
                 <div class="text-center">
                     <img src="{{ page_data.image.url }}" alt="Обложка проекта">
@@ -56,9 +68,6 @@
                         Plaza</a></li>
                 {% endif %}
             </ul>
-            <div class="container justify-content-start"><a class="btn btn-success"
-                                                            href="{% url 'translators_hub:apply_for' slug=page_data.slug %}">
-                Подать заявку на участие</a></div>
         </div>
     </div>
 {% endblock %}
