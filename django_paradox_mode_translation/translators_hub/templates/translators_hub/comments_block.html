@@ -1,5 +1,6 @@
 {% load static %}
 {% load translators_hub_tags %}
+{% load translators_hub_filters %}
 
 
 <div class="container border-3 justify-content-center">
@@ -35,14 +36,20 @@
                             <div class="comment-buttons"
                                  style="position: absolute; bottom: 5px; right: 5px; display: flex; gap: 5px;">
                                 <div>
-                                    <span>{{ comment.likes }}</span>
+                                    <span data-page="{{ page_data|get_model_name }}" data-url="{% url 'translators_hub:like-comment' %}"
+                                          id="likes-comment-{{ comment.pk }}">{{ comment.likes }}</span>
+
+                                    <button type="button" class="btn btn-success btn-sm rounded-circle"
+                                            onclick="likeComment({{ comment.pk }})">👍
+                                    </button>
                                 </div>
-                                <button type="button" class="btn btn-success btn-sm rounded-circle"
-                                        onclick="likeComment({{ comment.pk }})">👍
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm rounded-circle"
-                                        onclick="dislikeComment({{ comment.pk }})">👎
-                                </button>
+                                <div>
+                                    <span data-page="{{ page_data|get_model_name }}" data-url="{% url 'translators_hub:dislike-comment' %}"
+                                          id="dislikes-comment-{{ comment.pk }}">{{ comment.dislikes }}</span>
+                                    <button type="button" class="btn btn-danger btn-sm rounded-circle"
+                                            onclick="dislikeComment({{ comment.pk }})">👎
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         {% if delete_root %}
