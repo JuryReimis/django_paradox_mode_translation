@@ -3,8 +3,8 @@ from django.contrib.auth import views, login, authenticate, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib import messages
 from django.contrib.postgres.search import SearchVector
-from django.db.models import Q
-from django.forms import model_to_dict, modelformset_factory
+from django.db.models import Q, F
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
@@ -14,7 +14,7 @@ import translators_hub.models
 from . import models
 from .forms import UpdateProfileForm, RegistrationForm, AddPageForm, ServiceForm, ProfileFormForApply, InviteUserForm, ChangeUserRoleForm, ChangeDescriptionForm
 from .mixins import AddCommentMixin
-from .models import ModTranslation, UserProfile, ProfileComments, Roles, Invites, Game
+from .models import ModTranslation, UserProfile, ProfileComments, Roles, Invites, Game, ProjectComments
 from .utils.custom_paginator import CustomPaginator
 
 User = get_user_model()
@@ -440,3 +440,29 @@ class ApplyForView(generic.FormView):
             self.initial = current_user_profile.get_fields_in_dict()
             self.extra_context = {'reputation': current_user_profile.reputation}
             return super(ApplyForView, self).get(request=request, *args, **kwargs)
+
+
+def like_comment(request):
+    comment_object = request.POST.get('page_data')
+    comment_pk = request.POST.get('comment_pk')
+    if comment_object == 'ModTranslation':
+        comment = ProjectComments.objects.filter(pk=comment_pk)
+    elif comment_object == 'UserProfile':
+        comment = ProfileComments.objects.filter(pk=comment_pk)
+    comment.update(likes=F('likes') + 1)
+    comment = comment[0]
+    comment.refresh_from_db()
+    return JsonResponse({'likes': comment.likes})
+
+
+def dislike_comment(request):
+    comment_object = request.POST.get('page_data')
+    comment_pk = request.POST.get('comment_pk')
+    if comment_object == 'ModTranslation':
+        comment = ProjectComments.objects.filter(pk=comment_pk)
+    elif comment_object == 'UserProfile':
+        comment = ProfileComments.objects.filter(pk=comment_pk)
+    comment.update(dislikes=F('dislikes') + 1)
+    comment = comment[0]
+    comment.refresh_from_db()
+    return JsonResponse({'dislikes': comment.dislikes})
