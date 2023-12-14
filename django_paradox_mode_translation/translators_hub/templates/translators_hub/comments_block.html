@@ -53,7 +53,7 @@
                             </div>
                         </div>
                         {% if delete_root %}
-                            <div class="col col-sm-auto">
+                            <div class="col-auto text-end">
                                 <form method="post" name="delete">
                                     {% csrf_token %}
                                     <input class="button" type="hidden" name="comment_id"
