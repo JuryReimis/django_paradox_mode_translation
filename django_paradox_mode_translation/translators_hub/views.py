@@ -1,4 +1,3 @@
-import django.core.paginator
 from django.contrib.auth import views, login, authenticate, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib import messages
@@ -6,6 +5,7 @@ from django.contrib.postgres.search import SearchVector
 from django.db.models import Q, F
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
 from django.views import generic
@@ -13,8 +13,8 @@ from django.views import generic
 import translators_hub.models
 from . import models
 from .forms import UpdateProfileForm, RegistrationForm, AddPageForm, ServiceForm, ProfileFormForApply, InviteUserForm, ChangeUserRoleForm, ChangeDescriptionForm
-from .mixins import AddCommentMixin
-from .models import ModTranslation, UserProfile, ProfileComments, Roles, Invites, Game, ProjectComments
+from .mixins import AddCommentMixin, comment_reaction_mixin
+from .models import ModTranslation, UserProfile, Roles, Invites, Game
 from .utils.custom_paginator import CustomPaginator
 
 User = get_user_model()
@@ -106,7 +106,6 @@ class DetailView(AddCommentMixin, generic.DetailView):
         self.extra_context = {}
         try:
             self.get_comment_form()
-            self.object = self.get_object()
             if not isinstance(request.user, AnonymousUser):
                 role_object = self.object.authors.get(user=request.user)
                 if role_object.role in [Roles.ORGANISER, Roles.MODERATOR]:
@@ -209,7 +208,8 @@ class ProfileView(AddCommentMixin, generic.DetailView):
             if request.user.userprofile.slug == slug:
                 self.extra_context['update_button'] = True
                 self.extra_context['delete_root'] = True
-            return super(ProfileView, self).get(request, *args, **kwargs)
+            context = self.get_context_data(object=self.object)
+            return self.render_to_response(context)
 
 
 class UpdateProfileView(generic.UpdateView):
@@ -279,7 +279,7 @@ class AddPageView(generic.FormView):
             messages.add_message(request=request, level=messages.ERROR, message=error_message)
             return redirect('translators_hub:home')
         else:
-            return super(AddPageView, self).get(*args, **kwargs)
+            return super(AddPageView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -443,26 +443,36 @@ class ApplyForView(generic.FormView):
 
 
 def like_comment(request):
-    comment_object = request.POST.get('page_data')
-    comment_pk = request.POST.get('comment_pk')
-    if comment_object == 'ModTranslation':
-        comment = ProjectComments.objects.filter(pk=comment_pk)
-    elif comment_object == 'UserProfile':
-        comment = ProfileComments.objects.filter(pk=comment_pk)
-    comment.update(likes=F('likes') + 1)
-    comment = comment[0]
-    comment.refresh_from_db()
-    return JsonResponse({'likes': comment.likes})
+    comment, reaction, created = comment_reaction_mixin(request)
+    if comment:
+        if not created:
+            if reaction.reaction is True:
+                reaction.reaction = None
+            elif reaction.reaction is False:
+                reaction.reaction = True
+            elif reaction.reaction is None:
+                reaction.reaction = True
+        else:
+            reaction.reaction = True
+        reaction.save()
+        comment.refresh_from_db()
+        likes, dislikes = comment.get_reactions()
+        return JsonResponse({'likes': likes, 'dislikes': dislikes})
 
 
 def dislike_comment(request):
-    comment_object = request.POST.get('page_data')
-    comment_pk = request.POST.get('comment_pk')
-    if comment_object == 'ModTranslation':
-        comment = ProjectComments.objects.filter(pk=comment_pk)
-    elif comment_object == 'UserProfile':
-        comment = ProfileComments.objects.filter(pk=comment_pk)
-    comment.update(dislikes=F('dislikes') + 1)
-    comment = comment[0]
-    comment.refresh_from_db()
-    return JsonResponse({'dislikes': comment.dislikes})
+    comment, reaction, created = comment_reaction_mixin(request)
+    if comment:
+        if not created:
+            if reaction.reaction is True:
+                reaction.reaction = False
+            elif reaction.reaction is False:
+                reaction.reaction = None
+            elif reaction.reaction is None:
+                reaction.reaction = False
+        else:
+            reaction.reaction = False
+        reaction.save()
+        comment.refresh_from_db()
+        likes, dislikes = comment.get_reactions()
+        return JsonResponse({'likes': likes, 'dislikes': dislikes})
