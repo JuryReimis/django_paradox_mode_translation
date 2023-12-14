@@ -371,18 +371,6 @@ class AbstractComments(models.Model):
         verbose_name="Комментарий",
     )
 
-    likes = models.IntegerField(
-        default=0,
-        blank=False,
-        null=False,
-    )
-
-    dislikes = models.IntegerField(
-        default=0,
-        blank=False,
-        null=False,
-    )
-
     pub_date = models.DateTimeField(
         verbose_name='Дата написания комментария',
         null=True,
@@ -422,12 +410,61 @@ class ProfileComments(AbstractComments):
         related_name='profile_comments'
     )
 
+    def get_reactions(self) -> [int, int]:
+        likes = 0
+        dislikes = 0
+        for reaction in self.profile_comment_reactions.all():
+            if reaction.reaction is True:
+                likes += 1
+            elif reaction.reaction is False:
+                dislikes += 1
+        return likes, dislikes
+
     def __str__(self):
         return f'Комментарий пользователя {self.author} в профиле {self.target}'
 
     class Meta:
         verbose_name = "Комментарий в профиле"
         verbose_name_plural = "Комментарии в профиле"
+
+
+class ProfileCommentsReaction(models.Model):
+    LIKE = True
+    DISLIKE = False
+
+    REACTION = [
+        (LIKE, "Лайк"),
+        (DISLIKE, "Дизлайк"),
+        (None, "Нет реакции"),
+    ]
+
+    author = models.ForeignKey(
+        to=User,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='Автор реакции'
+    )
+
+    target = models.ForeignKey(
+        to=ProfileComments,
+        on_delete=models.CASCADE,
+        related_name='profile_comment_reactions',
+        verbose_name='Комментарий'
+    )
+
+    reaction = models.BooleanField(
+        choices=REACTION,
+        null=True,
+        blank=True,
+        verbose_name='Реакция на комментарий'
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['author', 'target'], name='unique_profile_comment_reaction')
+        ]
+        verbose_name = "Реакция на комментарий"
+        verbose_name_plural = "Реакции на комментарии"
 
 
 class ProjectComments(AbstractComments):
@@ -445,9 +482,56 @@ class ProjectComments(AbstractComments):
         related_name='project_comments',
     )
 
+    def get_reactions(self) -> [int, int]:
+        likes = 0
+        dislikes = 0
+        for reaction in self.project_comment_reactions.all():
+            if reaction.reaction is True:
+                likes += 1
+            elif reaction.reaction is False:
+                dislikes += 1
+        return likes, dislikes
+
     def __str__(self):
         return f'Комментарий пользователя {self.author} под проектом {self.target}'
 
     class Meta:
         verbose_name = "Комментарий под проектом"
         verbose_name_plural = "Комментарии под проектом"
+
+
+class ProjectCommentsReaction(models.Model):
+    LIKE = True
+    DISLIKE = False
+
+    REACTION = [
+        (LIKE, "Лайк"),
+        (DISLIKE, "Дизлайк"),
+        (None, "Нет реакции"),
+    ]
+
+    author = models.ForeignKey(
+        to=User,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='Автор реакции'
+    )
+
+    target = models.ForeignKey(
+        to=ProjectComments,
+        on_delete=models.CASCADE,
+        related_name='project_comment_reactions',
+        verbose_name='Комментарий'
+    )
+
+    reaction = models.BooleanField(
+        choices=REACTION,
+        null=True,
+        blank=True,
+        verbose_name='Реакция на комментарий'
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['author', 'target'], name='unique_project_comment_reaction')
+        ]
