@@ -3,7 +3,8 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views import generic
 
 from translators_hub.forms import AddProfileCommentForm, AddProjectCommentForm
-from translators_hub.models import UserProfile, ProfileComments, ModTranslation, ProjectComments
+from translators_hub.models import UserProfile, ProfileComments, ModTranslation, ProjectComments, \
+    ProjectCommentsReaction, ProfileCommentsReaction
 
 
 class AddCommentMixin(generic.edit.ModelFormMixin):
@@ -12,15 +13,15 @@ class AddCommentMixin(generic.edit.ModelFormMixin):
     author = None
 
     def get_comment_form(self):
-        current_object = self.get_object()
-        if isinstance(current_object, UserProfile):
+        self.object = self.get_object()
+        if isinstance(self.object, UserProfile):
             self.form_class = AddProfileCommentForm
-            self.target = current_object
-            self.success_url = current_object.get_absolute_url()
-        elif isinstance(current_object, ModTranslation):
+            self.target = self.object
+            self.success_url = self.object.get_absolute_url()
+        elif isinstance(self.object, ModTranslation):
             self.form_class = AddProjectCommentForm
-            self.target = current_object
-            self.success_url = current_object.get_absolute_url()
+            self.target = self.object
+            self.success_url = self.object.get_absolute_url()
 
     def get_context_data(self, **kwargs):
         if 'comment_form' not in kwargs:
@@ -53,3 +54,19 @@ class AddCommentMixin(generic.edit.ModelFormMixin):
             form.save()
 
         return redirect(self.get_object().get_absolute_url())
+
+
+def comment_reaction_mixin(request):
+    comment = None
+    reaction = None
+    created = None
+    comment_object = request.POST.get('page_data')
+    comment_pk = request.POST.get('comment_pk')
+    if comment_object == 'ModTranslation':
+        comment = ProjectComments.objects.filter(pk=comment_pk).first()
+        reaction, created = ProjectCommentsReaction.objects.get_or_create(target=comment, author=request.user)
+    elif comment_object == 'UserProfile':
+        comment = ProfileComments.objects.filter(pk=comment_pk).first()
+        reaction, created = ProfileCommentsReaction.objects.get_or_create(target=comment, author=request.user)
+
+    return comment, reaction, created
