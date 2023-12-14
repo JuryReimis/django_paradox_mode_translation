@@ -2,10 +2,14 @@ ul {
     list-style-type: none;
 }
 
-a, li {
+a {
     border-radius: 50px;
 }
 
 .borderless {
     border: none;
+}
+
+.border-radius-50 {
+    border-radius: 50px;
 }
