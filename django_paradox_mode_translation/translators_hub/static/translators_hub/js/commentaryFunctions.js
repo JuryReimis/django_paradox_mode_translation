@@ -15,7 +15,8 @@ function likeComment(commentId) {
         },
         success: function (response) {
             // Обновить отображение счетчика лайков на странице
-            element.textContent = response.likes
+            $('#likes-comment-' + commentId).text(response.likes)
+            $('#dislikes-comment-' + commentId).text(response.dislikes)
         },
         error: function (error) {
             console.log('Ошибка при отправке запроса: ', error);
@@ -39,7 +40,8 @@ function dislikeComment(commentId) {
         },
         success: function (response) {
             // Обновить отображение счетчика дизлайков на странице
-            element.textContent = response.dislikes;
+            $('#likes-comment-' + commentId).text(response.likes)
+            $('#dislikes-comment-' + commentId).text(response.dislikes)
         },
         error: function (error) {
             console.log('Ошибка при отправке запроса: ', error);
