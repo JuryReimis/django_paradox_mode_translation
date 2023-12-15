@@ -38,15 +38,14 @@
                                 <div>
                                     <span data-page="{{ page_data|get_model_name }}" data-url="{% url 'translators_hub:like-comment' %}"
                                           id="likes-comment-{{ comment.pk }}">{{ comment.likes }}</span>
-
-                                    <button type="button" class="btn btn-outline-success btn-sm rounded-circle"
+                                    <button id="like-button-{{ comment.pk }}" type="button" class="btn {{ comment.like_class }} btn-sm rounded-circle"
                                             onclick="likeComment({{ comment.pk }})">👍
                                     </button>
                                 </div>
                                 <div>
                                     <span data-page="{{ page_data|get_model_name }}" data-url="{% url 'translators_hub:dislike-comment' %}"
                                           id="dislikes-comment-{{ comment.pk }}">{{ comment.dislikes }}</span>
-                                    <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                                    <button id="dislike-button-{{ comment.pk }}" type="button" class="btn {{ comment.dislike_class }} btn-sm rounded-circle"
                                             onclick="dislikeComment({{ comment.pk }})">👎
                                     </button>
                                 </div>
