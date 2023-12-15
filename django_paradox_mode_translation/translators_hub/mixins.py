@@ -48,12 +48,27 @@ class AddCommentMixin(generic.edit.ModelFormMixin):
                 message_text = "Комментарий удален!"
                 messages.add_message(request, level=messages.SUCCESS, message=message_text)
         else:
-            form: AddProfileCommentForm = self.get_form()
+            form: AddProfileCommentForm | AddProjectCommentForm = self.get_form()
             form.instance.target = self.target
             form.instance.author = request.user
             form.save()
 
         return redirect(self.get_object().get_absolute_url())
+
+    def get_form_kwargs(self):
+        kwargs = {
+            "initial": self.get_initial(),
+            "prefix": self.get_prefix(),
+        }
+
+        if self.request.method in ("POST", "PUT"):
+            kwargs.update(
+                {
+                    "data": self.request.POST,
+                    "files": self.request.FILES,
+                }
+            )
+        return kwargs
 
 
 def comment_reaction_mixin(request):
