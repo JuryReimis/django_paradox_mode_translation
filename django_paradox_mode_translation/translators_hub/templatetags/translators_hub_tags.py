@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
-from django.db.models import Count, Case, When, Value, IntegerField
+from django.db.models import Count, Case, When, Value, IntegerField, CharField
 from django.template import Library
 
 from translators_hub.models import Invites, ProfileComments, UserProfile, ModTranslation, ProjectComments
@@ -41,6 +41,7 @@ def get_role_display(role):
 
 @register.simple_tag(takes_context=True)
 def get_comments(context, target):
+    user = context.get('user')
     object_list = []
     if isinstance(target, UserProfile):
         object_list = ProfileComments.objects.filter(target=target, visible=True).select_related('author').annotate(
@@ -48,6 +49,16 @@ def get_comments(context, target):
                 Case(When(profile_comment_reactions__reaction=True, then=Value(1)), output_field=IntegerField())),
             dislikes=Count(
                 Case(When(profile_comment_reactions__reaction=False, then=Value(1)), output_field=IntegerField())),
+            like_class=Case(When(profile_comment_reactions__reaction=True, profile_comment_reactions__author=user,
+                                 then=Value('btn-success')),
+                            default=Value('btn-outline-success'),
+                            output_field=CharField()
+                            ),
+            dislike_class=Case(When(profile_comment_reactions__reaction=False, profile_comment_reactions__author=user,
+                                    then=Value('btn-danger')),
+                               default=Value('btn-outline-danger'),
+                               output_field=CharField()
+                               ),
         ).order_by('-pub_date')
     elif isinstance(target, ModTranslation):
         object_list = ProjectComments.objects.filter(target=target, visible=True).select_related('author').annotate(
@@ -55,6 +66,16 @@ def get_comments(context, target):
                 Case(When(project_comment_reactions__reaction=True, then=Value(1)), output_field=IntegerField())),
             dislikes=Count(
                 Case(When(project_comment_reactions__reaction=False, then=Value(1)), output_field=IntegerField())),
+            like_class=Case(When(project_comment_reactions__reaction=True, project_comment_reactions__author=user,
+                                 then=Value('btn-success')),
+                            default=Value('btn-outline-success'),
+                            output_field=CharField()
+                            ),
+            dislike_class=Case(When(project_comment_reactions__reaction=False, project_comment_reactions__author=user,
+                                    then=Value('btn-danger')),
+                               default=Value('btn-outline-danger'),
+                               output_field=CharField()
+                               ),
         ).order_by('-pub_date')
     if object_list:
         paginator = CustomPaginator(object_list, per_page=5)
