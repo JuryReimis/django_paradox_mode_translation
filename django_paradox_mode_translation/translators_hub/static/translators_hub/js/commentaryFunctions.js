@@ -17,6 +17,8 @@ function likeComment(commentId) {
             // Обновить отображение счетчика лайков на странице
             $('#likes-comment-' + commentId).text(response.likes)
             $('#dislikes-comment-' + commentId).text(response.dislikes)
+            $('#like-button-' + commentId).removeClass(response.remove_like_class).addClass(response.add_like_class)
+            $('#dislike-button-' + commentId).removeClass(response.remove_dis_class).addClass(response.add_dis_class)
         },
         error: function (error) {
             console.log('Ошибка при отправке запроса: ', error);
@@ -42,6 +44,8 @@ function dislikeComment(commentId) {
             // Обновить отображение счетчика дизлайков на странице
             $('#likes-comment-' + commentId).text(response.likes)
             $('#dislikes-comment-' + commentId).text(response.dislikes)
+            $('#like-button-' + commentId).removeClass(response.remove_like_class).addClass(response.add_like_class)
+            $('#dislike-button-' + commentId).removeClass(response.remove_dis_class).addClass(response.add_dis_class)
         },
         error: function (error) {
             console.log('Ошибка при отправке запроса: ', error);
