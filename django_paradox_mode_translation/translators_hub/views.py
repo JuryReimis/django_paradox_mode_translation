@@ -444,35 +444,79 @@ class ApplyForView(generic.FormView):
 
 def like_comment(request):
     comment, reaction, created = comment_reaction_mixin(request)
+    remove_like_class = ''
+    add_like_class = ''
+    remove_dis_class = ''
+    add_dis_class = ''
     if comment:
         if not created:
             if reaction.reaction is True:
                 reaction.reaction = None
+                remove_like_class = 'btn-success'
+                add_like_class = 'btn-outline-success'
             elif reaction.reaction is False:
                 reaction.reaction = True
+                remove_like_class = 'btn-outline-success'
+                add_like_class = 'btn-success'
+                remove_dis_class = 'btn-danger'
+                add_dis_class = 'btn-outline-danger'
             elif reaction.reaction is None:
                 reaction.reaction = True
+                add_like_class = 'btn-success'
+                remove_like_class = 'btn-outline-success'
         else:
             reaction.reaction = True
+            add_like_class = 'btn-success'
+            remove_like_class = 'btn-outline-success'
         reaction.save()
         comment.refresh_from_db()
         likes, dislikes = comment.get_reactions()
-        return JsonResponse({'likes': likes, 'dislikes': dislikes})
+        context = {
+            'likes': likes,
+            'dislikes': dislikes,
+            'add_like_class': add_like_class,
+            'remove_like_class': remove_like_class,
+            'add_dis_class': add_dis_class,
+            'remove_dis_class': remove_dis_class,
+        }
+        return JsonResponse(context)
 
 
 def dislike_comment(request):
     comment, reaction, created = comment_reaction_mixin(request)
+    remove_like_class = ''
+    add_like_class = ''
+    remove_dis_class = ''
+    add_dis_class = ''
     if comment:
         if not created:
             if reaction.reaction is True:
                 reaction.reaction = False
+                remove_dis_class = 'btn-outline-danger'
+                add_dis_class = 'btn-danger'
+                remove_like_class = 'btn-success'
+                add_like_class = 'btn-outline-success'
             elif reaction.reaction is False:
                 reaction.reaction = None
+                remove_dis_class = 'btn-danger'
+                add_dis_class = 'btn-outline-danger'
             elif reaction.reaction is None:
                 reaction.reaction = False
+                add_dis_class = 'btn-danger'
+                remove_dis_class = 'btn-outline-danger'
         else:
             reaction.reaction = False
+            add_dis_class = 'btn-danger'
+            remove_dis_class = 'btn-outline-danger'
         reaction.save()
         comment.refresh_from_db()
         likes, dislikes = comment.get_reactions()
-        return JsonResponse({'likes': likes, 'dislikes': dislikes})
+        context = {
+            'likes': likes,
+            'dislikes': dislikes,
+            'add_like_class': add_like_class,
+            'remove_like_class': remove_like_class,
+            'add_dis_class': add_dis_class,
+            'remove_dis_class': remove_dis_class,
+        }
+        return JsonResponse(context)
