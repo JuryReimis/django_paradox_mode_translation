@@ -29,15 +29,16 @@
                         aria-label="Close"></button>
             </div>
             <div class="offcanvas-body" style="font-size: 20px">
+            <input type="hidden" id="user-logged" value="{{ user }}">
                 <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                     {% if user_logged %}
                         <li><a class="dropdown-item"
                                href="{% url 'translators_hub:profile' user_logged.slug %}"><img src="/media/{{ user_logged.profile_image }}" alt="{{ user_logged.profile_image }}" class="profile-icon">Профиль</a></li>
 
-                        <li><a class="dropdown-item"
+                        <li><a id="active-projects" class="dropdown-item"
                                href="{% url 'translators_hub:my_projects' user_logged.slug %}">Мои
                             проекты({{ active_projects|length }})</a></li>
-                        <li><a class="dropdown-item"
+                        <li><a id="active-invites" class="dropdown-item"
                                href="{% url 'translators_hub:invites' user_logged.slug %}">Приглашения
                             ({{ active_invites|length }})</a>
                         </li>
@@ -59,3 +60,6 @@
         </div>
     </div>
 </nav>
+
+<script src="{% static 'translators_hub/js/jQuery/jQuery.js' %}"></script>
+<script src="{% static 'translators_hub/js/userWebSocket.js' %}"></script>
