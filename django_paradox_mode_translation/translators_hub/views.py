@@ -1,3 +1,6 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+from channels_redis.core import RedisChannelLayer
 from django.contrib.auth import views, login, authenticate, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib import messages
@@ -7,12 +10,13 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
-from django.utils.text import slugify
+from slugify import slugify
 from django.views import generic
 
 import translators_hub.models
 from . import models
-from .forms import UpdateProfileForm, RegistrationForm, AddPageForm, ServiceForm, ProfileFormForApply, InviteUserForm, ChangeUserRoleForm, ChangeDescriptionForm
+from .forms import UpdateProfileForm, RegistrationForm, AddPageForm, ServiceForm, ProfileFormForApply, InviteUserForm, \
+    ChangeUserRoleForm, ChangeDescriptionForm
 from .mixins import AddCommentMixin, comment_reaction_mixin
 from .models import ModTranslation, UserProfile, Roles, Invites, Game
 from .utils.custom_paginator import CustomPaginator
@@ -63,6 +67,7 @@ class SearchProjectView(generic.ListView):
             obj_name = obj._meta.model_name
             obj.model_name = obj_name
             return obj
+
         search_query = self.extra_context.get('search_query')
         if search_query:
             search_vector_for_projects = SearchVector('title', 'mode_name', 'description')
@@ -76,10 +81,11 @@ class SearchProjectView(generic.ListView):
             return search_results
         else:
             self.extra_context['search_query'] = ''
-            search_results = list(map(add_model_name, list(ModTranslation.objects.all()) + list(UserProfile.objects.all())))
+            search_results = list(
+                map(add_model_name, list(ModTranslation.objects.all()) + list(UserProfile.objects.all())))
             self.extra_context['total_objects'] = len(search_results)
             return search_results
-    
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(SearchProjectView, self).get_context_data(object_list=object_list, **kwargs)
         paginator: CustomPaginator = context['paginator']
@@ -159,7 +165,7 @@ class ManagementView(generic.View):
                 messages.add_message(request, level=messages.SUCCESS, message='Успешно!')
             else:
                 messages.add_message(request=request, level=messages.ERROR, message=change_description_form.errors)
-            return redirect('translators_hub:management', slug=slug,)
+            return redirect('translators_hub:management', slug=slug, )
         else:
             return redirect('translators_hub:management', slug=slug)
 
@@ -199,7 +205,8 @@ class ProfileView(AddCommentMixin, generic.DetailView):
         if isinstance(request.user, AnonymousUser):
             error_message = "Для просмотра профилей наших пользователей - авторизуйтесь!"
             messages.add_message(request=request, level=messages.ERROR, message=error_message)
-            return redirect(request.META.get('HTTP_REFERER') if request.META.get('HTTP_REFERER') else reverse('translators_hub:home'))
+            return redirect(request.META.get('HTTP_REFERER') if request.META.get('HTTP_REFERER') else reverse(
+                'translators_hub:home'))
         else:
             self.extra_context = {
                 'slug': slug,
@@ -239,7 +246,8 @@ class UpdateProfileView(generic.UpdateView):
                 return redirect(reverse('translators_hub:profile', kwargs={'slug': slug}))
 
     def post(self, request, *args, **kwargs):
-        self.success_url = reverse_lazy('translators_hub:profile', kwargs={'slug': request.resolver_match.kwargs.get('slug')})
+        self.success_url = reverse_lazy('translators_hub:profile',
+                                        kwargs={'slug': request.resolver_match.kwargs.get('slug')})
         return super(UpdateProfileView, self).post(request, *args, **kwargs)
 
 
@@ -340,7 +348,7 @@ class InvitesView(generic.ListView):
                 invite.status = Invites.ACCEPTED
                 invite.save()
         elif declined:
-            invites = Invites.objects.filter(pk__in=declined)
+            invites = Invites.objects.filter(pk=declined)
             for invite in invites:
                 invite.status = Invites.DECLINED
                 invite.save()
@@ -401,8 +409,7 @@ class SendInvitesView(generic.ListView):
         else:
             return super_method
 
-    @staticmethod
-    def post(request, slug, *args, **kwargs):
+    def post(self, request, slug, *args, **kwargs):
         form = InviteUserForm(request.POST)
         mod_translation = ModTranslation.objects.get(slug=slug)
         if form.is_valid():
@@ -410,11 +417,26 @@ class SendInvitesView(generic.ListView):
             role = data.role
             data.mod_translation = mod_translation
             data.sender = request.user
-            data.target_id = request.POST.get('target_user_id')
+            target_id = request.POST.get('target_user_id')
+            data.target_id = target_id
             data.role = None if role == '' else role
             data.save()
             form.save_m2m()
+            self.update_invites(target_id)
         return redirect(reverse('translators_hub:invite_authors', kwargs={'slug': slug}))
+
+    @staticmethod
+    def update_invites(target_id):
+        user = User.objects.get(pk=target_id)
+        new_count = user.target_name.filter(status=None).count()
+        print(user.username, new_count)
+        channel_layer: RedisChannelLayer = get_channel_layer()
+        async_to_sync(channel_layer.group_add(user.username, user.username))
+        async_to_sync(channel_layer.group_send)(user.username,
+                                                {
+                                                    'type': 'message.update.invite.count',
+                                                    'new_count': new_count
+                                                })
 
 
 class ApplyForView(generic.FormView):
