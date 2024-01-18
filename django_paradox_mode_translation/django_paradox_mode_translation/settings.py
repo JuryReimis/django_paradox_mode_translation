@@ -38,6 +38,7 @@ LOGOUT_REDIRECT_URL = reverse_lazy('translators_hub:home')
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'debug_toolbar',
     'translators_hub.apps.TranslatorsHubConfig',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -80,6 +82,17 @@ TEMPLATES = [
         },
     },
 ]
+
+ASGI_APPLICATION = 'django_paradox_mode_translation.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 WSGI_APPLICATION = 'django_paradox_mode_translation.wsgi.application'
 
