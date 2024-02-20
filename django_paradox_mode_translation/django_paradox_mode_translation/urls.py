@@ -21,6 +21,7 @@ from django_paradox_mode_translation import settings
 
 urlpatterns = [
     path('', include('translators_hub.urls'), name='home'),
+    path('teams/', include('teams.urls'), name='teams'),
     path('admin/', admin.site.urls),
 
 ]
