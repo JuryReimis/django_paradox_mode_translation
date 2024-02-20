@@ -1,0 +1,47 @@
+{% extends 'translators_hub/base.html' %}
+
+{% block content %}
+    <div class="py-3"><a class="btn btn-success" href="{% url 'teams:invite_user' slug=team_data.slug %}">Пригласить в команду</a></div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        {{ team_data.team_title }}
+                    </div>
+                    <div class="card-body">
+                        <p>Здесь будет общая информация.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Пользователи
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
+
+                            <thead>
+                            <tr>
+                                <th>Имя человека</th>
+                                <th>Должность</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for member in team_data.team_members.all %}
+                            <tr>
+                                <td>{{ member.user }}</td>
+                                <td>{{ member.get_role_display }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
