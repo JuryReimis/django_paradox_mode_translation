@@ -1,0 +1,32 @@
+{% extends 'translators_hub/base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        Мои команды
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            {% for team in teams %}
+                                <li>
+                                    <a href="{{ team.get_absolute_url }}">
+                                        <div class="card mb-3" style="cursor: pointer;">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ team }}</h5>
+                                                <p class="card-text">Количество участников: {{ team.team_members.all.count }}</p>
+                                                <p class="card-text">{{ team.reputation }}</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
