@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'debug_toolbar',
     'translators_hub.apps.TranslatorsHubConfig',
+    'teams.apps.TeamsConfig',
     'channels',
 ]
 
