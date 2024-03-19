@@ -43,4 +43,39 @@
     {% else %}
         <h3>Пока для вас ничего нет</h3>
     {% endif %}
+    <hr>
+    <h1 class="modal-title">Приглашения в команды для вас:</h1>
+    {% if team_invites %}
+        <div class="container">
+            <table class="table table-light table-hover table-bordered">
+                <tr>
+                    <td>Перевод мода</td>
+                    <td>Автор</td>
+                    <td>Приглашение</td>
+                </tr>
+                {% for invite in team_invites %}
+                    <tr>
+                        <td><a class="btn btn-outline-info"
+                               href="{{ invite.team.get_absolute_url }}">{{ invite.team }}</a>
+                        </td>
+                        <td>{{ invite.sender }}</td>
+                        <td>{{ invite.text_invite }}</td>
+                        <td>
+                            <form method="post" action="{% url 'teams:invites'%}">{% csrf_token %}
+                                <button class="btn btn-outline-success" type="submit" value="{{ invite.pk }}"
+                                        name="accept">Принять
+                                </button>
+                                |
+                                <button class="btn btn-outline-danger" type="submit" value="{{ invite.pk }}"
+                                        name="decline">Отклонить
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% else %}
+        <h3>Пока для вас ничего нет</h3>
+    {% endif %}
 {% endblock content %}
