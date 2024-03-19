@@ -1,10 +1,11 @@
+from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import generic
 
 from teams.forms import InviteUserForm
-from teams.models import Teams, TeamInvites
+from teams.models import Teams, TeamInvites, TeamMembers
 from translators_hub.models import User
 
 
@@ -58,3 +59,26 @@ class SendInviteView(generic.ListView):
         data.save()
         form.save_m2m()
         return redirect(reverse('teams:invite_user', kwargs={'slug': slug}))
+
+
+class TeamInvitesHandler(generic.View):
+
+    def post(self, request, *args, **kwargs):
+        accepted = request.POST.get('accept')
+        declined = request.POST.get('decline')
+        if accepted:
+            invites = TeamInvites.objects.filter(Q(pk__in=accepted) | Q(pk=accepted))
+            for invite in invites:
+                member_note = TeamMembers.objects.get_or_create(team=invite.team, user=request.user)[0]
+                member_note.save()
+                invite.status = TeamInvites.ACCEPTED
+                invite.save()
+        elif declined:
+            invites = TeamInvites.objects.filter(pk=declined)
+            for invite in invites:
+                invite.status = TeamInvites.DECLINED
+                invite.save()
+        else:
+            error_message = "Ошибка чтения значения кнопки, повторите попытку"
+            messages.add_message(request=request, level=messages.ERROR, message=error_message)
+        return redirect(reverse('translators_hub:invites', kwargs={'slug': request.user.userprofile.slug}))
