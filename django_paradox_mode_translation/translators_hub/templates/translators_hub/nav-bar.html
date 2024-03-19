@@ -41,7 +41,7 @@
                             проекты({{ active_projects|length }})</a></li>
                         <li><a id="active-invites" class="dropdown-item"
                                href="{% url 'translators_hub:invites' user_logged.slug %}">Приглашения
-                            ({{ active_invites|length }})</a>
+                            ({{ active_invites|length }} | {{ active_team_invites|length }})</a>
                         </li>
                         <li>
                             <a class="btn btn-danger"
