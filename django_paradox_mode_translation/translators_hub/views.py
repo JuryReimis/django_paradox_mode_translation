@@ -14,6 +14,7 @@ from slugify import slugify
 from django.views import generic
 
 import translators_hub.models
+from teams.models import TeamInvites
 from . import models
 from .forms import UpdateProfileForm, RegistrationForm, AddPageForm, ServiceForm, ProfileFormForApply, InviteUserForm, \
     ChangeUserRoleForm, ChangeDescriptionForm
@@ -335,7 +336,9 @@ class InvitesView(generic.ListView):
 
     def get_queryset(self):
         invites = self.request.user.target_name.filter(status=None).prefetch_related('sender', 'mod_translation')
-        self.extra_context = {'slug': self.kwargs.get('slug')}
+        team_invites = self.request.user.team_target_name.filter(status=TeamInvites.NO_RESPONSE).prefetch_related('sender', 'team')
+        self.extra_context = {'slug': self.kwargs.get('slug'),
+                              'team_invites': team_invites}
         return invites
 
     def post(self, request, slug, *args, **kwargs):
