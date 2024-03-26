@@ -267,6 +267,14 @@ class Roles(models.Model):
         ordering = ['role']
 
 
+class Language(models.Model):
+    language_title = models.CharField(max_length=160, blank=False, null=False, unique=True, verbose_name="Язык")
+
+    class Meta:
+        verbose_name = "Язык"
+        verbose_name_plural = "Языки"
+
+
 class Invites(models.Model):
 
     ACCEPTED = 'ok'
