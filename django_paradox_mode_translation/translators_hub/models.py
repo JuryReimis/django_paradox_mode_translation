@@ -82,7 +82,7 @@ def get_image_project_path(instance, filename):
     return f'translators_hub/{instance.slug}/{filename}'
 
 
-class ModTranslation(models.Model):
+class Translation(models.Model):
 
     ENGLISH = 'en'
     FRENCH = 'fr'
@@ -124,13 +124,6 @@ class ModTranslation(models.Model):
         verbose_name="URL",
     )
 
-    mode_name = models.CharField(
-        max_length=100,
-        blank=False,
-        unique=True,
-        verbose_name="Перевод для модификации:"
-    )
-
     description = models.CharField(
         max_length=3000,
         null=True,
@@ -145,36 +138,18 @@ class ModTranslation(models.Model):
         blank=True
     )
 
-    original_language = models.CharField(
-        max_length=5,
-        choices=VALID_LANGUAGES,
-        blank=False,
-        default=ENGLISH
+    original_language = models.ForeignKey(
+        to='Language',
+        on_delete=models.PROTECT,
+        related_name='original_language',
+        verbose_name="Исходный язык"
     )
 
-    target_language = models.CharField(
-        max_length=5,
-        choices=VALID_LANGUAGES,
-        blank=False,
-        default=RUSSIAN
-    )
-
-    steam_link = models.URLField(
-        max_length=200,
-        blank=True,
-        null=True,
-        unique=True,
-        default=None,
-        verbose_name="Ссылка на мастерскую"
-    )
-
-    paradox_plaza_link = models.URLField(
-        max_length=200,
-        blank=True,
-        null=True,
-        unique=True,
-        default=None,
-        verbose_name="Ссылка на Плазу"
+    target_language = models.ForeignKey(
+        to='Language',
+        on_delete=models.PROTECT,
+        related_name='target_language',
+        verbose_name="Целевой язык"
     )
 
     image = models.ImageField(
@@ -270,6 +245,9 @@ class Roles(models.Model):
 class Language(models.Model):
     language_title = models.CharField(max_length=160, blank=False, null=False, unique=True, verbose_name="Язык")
 
+    def __str__(self):
+        return self.language_title
+
     class Meta:
         verbose_name = "Язык"
         verbose_name_plural = "Языки"
@@ -286,7 +264,7 @@ class Invites(models.Model):
     ]
 
     mod_translation = models.ForeignKey(
-        to=ModTranslation,
+        to=Translation,
         on_delete=models.CASCADE,
     )
 
@@ -484,7 +462,7 @@ class ProjectComments(AbstractComments):
     )
 
     target = models.ForeignKey(
-        to=ModTranslation,
+        to=Translation,
         on_delete=models.CASCADE,
         null=True,
         related_name='project_comments',
