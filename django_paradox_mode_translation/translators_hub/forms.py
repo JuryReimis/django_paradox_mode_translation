@@ -3,7 +3,8 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
 
-from translators_hub.models import UserProfile, ModTranslation, Invites, Roles, Game, ProfileComments, ProjectComments
+from translators_hub.models import UserProfile, Translation, Invites, Roles, Game, ProfileComments, ProjectComments, \
+    Language
 
 User = get_user_model()
 
@@ -64,13 +65,6 @@ class AddPageForm(forms.ModelForm):
         label="Название",
     )
 
-    mode_name = forms.CharField(
-        widget=forms.TextInput(attrs={
-
-        }),
-        label="Название оригинального мода"
-    )
-
     game = forms.ModelChoiceField(
         widget=forms.Select(attrs={
 
@@ -79,45 +73,25 @@ class AddPageForm(forms.ModelForm):
         label="Игра"
     )
 
-    steam_link = forms.URLField(
-        widget=forms.URLInput(attrs={
-
-        }),
-        empty_value=None,
-        required=False,
-        label="Ссылка на страницу мода в Steam"
-    )
-
-    paradox_plaza_link = forms.URLField(
-        widget=forms.URLInput(attrs={
-
-        }),
-        empty_value=None,
-        required=False,
-        label="Ссылка на страницу мода на ParadoxPlaza"
-    )
-
-    original_language = forms.ChoiceField(
+    original_language = forms.ModelChoiceField(
         widget=forms.Select(attrs={
 
         }),
-        choices=ModTranslation.VALID_LANGUAGES,
-        initial=ModTranslation.ENGLISH,
+        queryset=Language.objects.filter(),
         label="Язык оригинала"
     )
 
-    target_language = forms.ChoiceField(
+    target_language = forms.ModelChoiceField(
         widget=forms.Select(attrs={
 
         }),
-        choices=ModTranslation.VALID_LANGUAGES,
-        initial=ModTranslation.RUSSIAN,
+        queryset=Language.objects.filter(),
         label="Целевой язык"
     )
 
     class Meta:
-        model = ModTranslation
-        fields = ['title', 'mode_name', 'game', 'steam_link', 'paradox_plaza_link', 'original_language',
+        model = Translation
+        fields = ['title', 'game', 'original_language',
                   'target_language']
 
 
@@ -152,24 +126,8 @@ class ChangeDescriptionForm(forms.ModelForm):
         label="Описание"
     )
 
-    steam_link = forms.URLField(
-        widget=forms.URLInput(attrs={
-            "size": 100
-        }),
-        required=False,
-        label="Ссылка на оригинал мода в Steam"
-    )
-
-    paradox_plaza_link = forms.URLField(
-        widget=forms.URLInput(attrs={
-            "size": 100
-        }),
-        required=False,
-        label="Ссылка на оригинал мода на Paradox Plaza"
-    )
-
     status = forms.ChoiceField(
-        choices=ModTranslation.STATUS,
+        choices=Translation.STATUS,
         widget=forms.Select(
             attrs={
 
@@ -178,25 +136,9 @@ class ChangeDescriptionForm(forms.ModelForm):
         label="Статус проекта"
     )
 
-    def clean_steam_link(self):
-        steam_link = self.cleaned_data['steam_link']
-        if steam_link:
-            response = requests.get(steam_link)
-            if response.status_code != 200:
-                raise forms.ValidationError("Страницы с таким адресом не существует")
-        return steam_link
-
-    def clean_paradox_plaza_link(self):
-        paradox_plaza_link = self.cleaned_data['paradox_plaza_link']
-        if paradox_plaza_link:
-            response = requests.get(paradox_plaza_link)
-            if response.status_code != 200:
-                raise forms.ValidationError("Страницы с таким адресом не существует")
-        return paradox_plaza_link
-
     class Meta:
-        model = ModTranslation
-        fields = ['title', 'image', 'description', 'steam_link', 'paradox_plaza_link', 'status']
+        model = Translation
+        fields = ['title', 'image', 'description', 'status']
 
 
 class InviteUserForm(forms.ModelForm):
