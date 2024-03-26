@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'translators_hub.apps.TranslatorsHubConfig',
     'teams.apps.TeamsConfig',
+    'moderators.apps.ModeratorsConfig',
     'channels',
 ]
 
