@@ -8,7 +8,6 @@ from django.contrib.postgres.search import SearchVector
 from django.db.models import Q, F
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from slugify import slugify
 from django.views import generic
@@ -19,7 +18,7 @@ from . import models
 from .forms import UpdateProfileForm, RegistrationForm, AddPageForm, ServiceForm, ProfileFormForApply, InviteUserForm, \
     ChangeUserRoleForm, ChangeDescriptionForm
 from .mixins import AddCommentMixin, comment_reaction_mixin
-from .models import ModTranslation, UserProfile, Roles, Invites, Game
+from .models import Translation, UserProfile, Roles, Invites, Game
 from .utils.custom_paginator import CustomPaginator
 
 User = get_user_model()
@@ -38,9 +37,9 @@ class HomeView(generic.ListView):
 
     def get_queryset(self):
         if self.extra_filter:
-            return ModTranslation.objects.filter(game__in=self.extra_filter.get('selected_game')).order_by(
+            return Translation.objects.filter(game__in=self.extra_filter.get('selected_game')).order_by(
                 '-created_date')
-        return ModTranslation.objects.order_by('-created_date')
+        return Translation.objects.order_by('-created_date')
 
     def get(self, request, *args, **kwargs):
         selected_category = request.GET.get('game')
@@ -71,9 +70,9 @@ class SearchProjectView(generic.ListView):
 
         search_query = self.extra_context.get('search_query')
         if search_query:
-            search_vector_for_projects = SearchVector('title', 'mode_name', 'description')
+            search_vector_for_projects = SearchVector('title', 'description')
             search_vector_for_users = SearchVector('user__username', 'user__first_name', 'user__last_name')
-            searched_projects = ModTranslation.objects.annotate(search=search_vector_for_projects).filter(
+            searched_projects = Translation.objects.annotate(search=search_vector_for_projects).filter(
                 search=search_query)
             searched_users = UserProfile.objects.annotate(search=search_vector_for_users).filter(
                 search=search_query)
@@ -83,7 +82,7 @@ class SearchProjectView(generic.ListView):
         else:
             self.extra_context['search_query'] = ''
             search_results = list(
-                map(add_model_name, list(ModTranslation.objects.all()) + list(UserProfile.objects.all())))
+                map(add_model_name, list(Translation.objects.all()) + list(UserProfile.objects.all())))
             self.extra_context['total_objects'] = len(search_results)
             return search_results
 
@@ -105,7 +104,7 @@ class SearchProjectView(generic.ListView):
 
 
 class DetailView(AddCommentMixin, generic.DetailView):
-    model = ModTranslation
+    model = Translation
     template_name = 'translators_hub/detail_page.html'
     context_object_name = 'page_data'
 
@@ -128,7 +127,7 @@ class ManagementView(generic.View):
     template_name = 'translators_hub/project_management.html'
 
     def get(self, request, slug, *args, **kwargs):
-        project = ModTranslation.objects.get(slug=slug)
+        project = Translation.objects.get(slug=slug)
         project_authors = None
         project_moderator = None
         description_form = ChangeDescriptionForm(instance=project)
@@ -152,7 +151,7 @@ class ManagementView(generic.View):
             return render(request=request, template_name='translators_hub/detail_page.html', context=context)
 
     def post(self, request, slug, *args, **kwargs):
-        project = ModTranslation.objects.get(slug=slug)
+        project = Translation.objects.get(slug=slug)
         if request.POST.get('fired'):
             fired_users = Roles.objects.filter(user_id__in=request.POST.get('fired'))
             for author in fired_users:
@@ -183,11 +182,11 @@ class ChangeRoleView(generic.edit.FormView):
 
     def post(self, request, *args, **kwargs):
         user = User.objects.get(username=kwargs.get('username'))
-        mod_translation = ModTranslation.objects.get(slug=kwargs.get('slug'))
-        old_role = user.roles.get(modtranslation=mod_translation)
+        translation = Translation.objects.get(slug=kwargs.get('slug'))
+        old_role = user.roles.get(translation=translation)
         new_role = Roles.objects.get_or_create(user=user, role=request.POST.get('role'))[0]
-        mod_translation.authors.remove(old_role)
-        mod_translation.authors.add(new_role)
+        translation.authors.remove(old_role)
+        translation.authors.add(new_role)
         return redirect('translators_hub:management', slug=kwargs.get('slug'))
 
 
@@ -312,7 +311,7 @@ class MyProjectsView(generic.ListView):
     def get_queryset(self):
         user = self.request.user
         if user is not AnonymousUser:
-            projects = ModTranslation.objects.filter(authors__user=user).prefetch_related('authors', 'game')
+            projects = Translation.objects.filter(authors__user=user).prefetch_related('authors', 'game')
 
             roles = {project.id: project.authors__role for project in
                      projects.values_list('id', 'authors__role', named=True)}
@@ -383,7 +382,7 @@ class SendInvitesView(generic.ListView):
 
     def get_queryset(self):
         slug = self.request.resolver_match.kwargs['slug']
-        self.current_data = ModTranslation.objects.get(slug=slug)
+        self.current_data = Translation.objects.get(slug=slug)
         self.current_authors = self.current_data.authors.all().prefetch_related('user')
         for author in self.current_authors:
             if author.role in [Roles.ORGANISER, Roles.MODERATOR]:
@@ -414,11 +413,11 @@ class SendInvitesView(generic.ListView):
 
     def post(self, request, slug, *args, **kwargs):
         form = InviteUserForm(request.POST)
-        mod_translation = ModTranslation.objects.get(slug=slug)
+        translation = Translation.objects.get(slug=slug)
         if form.is_valid():
             data = form.save(commit=False)
             role = data.role
-            data.mod_translation = mod_translation
+            data.mod_translation = translation
             data.sender = request.user
             target_id = request.POST.get('target_user_id')
             data.target_id = target_id
@@ -450,7 +449,7 @@ class ApplyForView(generic.FormView):
 
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
-        current_page = ModTranslation.objects.get(slug=slug)
+        current_page = Translation.objects.get(slug=slug)
 
         if not request.user.is_authenticated:
             error_message = "Необходимо авторизоваться"
