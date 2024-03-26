@@ -2,7 +2,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.db.models import Count, Case, When, Value, IntegerField, CharField
 from django.template import Library
 
-from translators_hub.models import Invites, ProfileComments, UserProfile, ModTranslation, ProjectComments
+from translators_hub.models import Invites, ProfileComments, UserProfile, Translation, ProjectComments
 from translators_hub.utils.custom_paginator import CustomPaginator
 
 register = Library()
@@ -62,7 +62,7 @@ def get_comments(context, target):
                                output_field=CharField()
                                ),
         ).order_by('-pub_date')
-    elif isinstance(target, ModTranslation):
+    elif isinstance(target, Translation):
         object_list = ProjectComments.objects.filter(target=target, visible=True).select_related('author').annotate(
             likes=Count(
                 Case(When(project_comment_reactions__reaction=True, then=Value(1)), output_field=IntegerField())),
