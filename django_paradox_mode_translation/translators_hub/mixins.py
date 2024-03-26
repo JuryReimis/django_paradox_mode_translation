@@ -3,7 +3,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views import generic
 
 from translators_hub.forms import AddProfileCommentForm, AddProjectCommentForm
-from translators_hub.models import UserProfile, ProfileComments, ModTranslation, ProjectComments, \
+from translators_hub.models import UserProfile, ProfileComments, Translation, ProjectComments, \
     ProjectCommentsReaction, ProfileCommentsReaction
 
 
@@ -18,7 +18,7 @@ class AddCommentMixin(generic.edit.ModelFormMixin):
             self.form_class = AddProfileCommentForm
             self.target = self.object
             self.success_url = self.object.get_absolute_url()
-        elif isinstance(self.object, ModTranslation):
+        elif isinstance(self.object, Translation):
             self.form_class = AddProjectCommentForm
             self.target = self.object
             self.success_url = self.object.get_absolute_url()
@@ -36,7 +36,7 @@ class AddCommentMixin(generic.edit.ModelFormMixin):
             if isinstance(current_object, UserProfile):
                 comment = get_object_or_404(ProfileComments, pk=delete_id)
                 comment.visible = False
-            elif isinstance(current_object, ModTranslation):
+            elif isinstance(current_object, Translation):
                 comment = get_object_or_404(ProjectComments, pk=delete_id)
                 comment.visible = False
             try:
@@ -77,7 +77,7 @@ def comment_reaction_mixin(request):
     created = None
     comment_object = request.POST.get('page_data')
     comment_pk = request.POST.get('comment_pk')
-    if comment_object == 'ModTranslation':
+    if comment_object == 'Translation':
         comment = ProjectComments.objects.filter(pk=comment_pk).first()
         reaction, created = ProjectCommentsReaction.objects.get_or_create(target=comment, author=request.user)
     elif comment_object == 'UserProfile':
