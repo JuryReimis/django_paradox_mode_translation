@@ -83,14 +83,23 @@ class Query(models.Model):
     def __str__(self):
         return f'Заявка №{self.pk}'
 
+    class Meta:
+        verbose_name = "Обращение"
+        verbose_name_plural = "Обращения"
+
 
 class Topic(models.Model):
 
     topic_title = models.CharField(
         max_length=120,
         blank=False,
+        unique=True,
         verbose_name="Тема обращения"
     )
 
     def __str__(self):
         return f'Тема - {self.topic_title}'
+
+    class Meta:
+        verbose_name = "Тема обращения"
+        verbose_name_plural = "Темы обращений"
