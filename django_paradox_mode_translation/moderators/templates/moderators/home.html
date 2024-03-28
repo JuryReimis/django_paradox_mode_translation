@@ -2,7 +2,7 @@
 
 {% block content %}
     <a href="{% url 'moderators:send_query' %}">Отправить заявку</a>
-    <a href="/">Посмотреть статус заявки</a>
+    <a href="{% url 'moderators:my_queries' %}">Оставленные заявки</a>
     <a href="/">Рассмотреть заявку</a>
     <a href="/">Заявки на рассмотрении</a>
 {% endblock %}
