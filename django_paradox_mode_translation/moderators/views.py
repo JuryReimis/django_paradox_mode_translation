@@ -2,9 +2,11 @@ from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 
 from django.views import View
-from django.views.generic import FormView
+from django.views.generic import FormView, ListView
 
 from moderators.forms import SendQueryForm
+from moderators.models import Query
+from translators_hub.utils.custom_paginator import CustomPaginator
 
 
 class ModeratorHomeView(View):
@@ -31,3 +33,15 @@ class SendQueryView(FormView):
         form.save()
         return super(SendQueryView, self).form_valid(form)
 
+
+class MyQueriesView(ListView):
+
+    model = Query
+    paginator_class = CustomPaginator
+    paginate_by = 10
+    context_object_name = 'queries'
+    template_name = 'moderators/my_queries.html'
+
+    def get_queryset(self):
+        my_queries = Query.objects.filter(query_author=self.request.user).select_related('topic_of_query')
+        return my_queries
