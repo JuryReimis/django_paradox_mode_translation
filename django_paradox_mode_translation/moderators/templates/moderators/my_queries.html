@@ -1,0 +1,37 @@
+{% extends 'translators_hub/base.html' %}
+{% load translators_hub_tags %}
+
+{% block content %}
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th>Номер заявки</th>
+            <th>Текст обращения</th>
+            <th>Тема обращения</th>
+            <th>Статус заявки</th>
+            <th>Заявка отправлена</th>
+            <th>Модератор, начавший рассмотрение</th>
+            <th>Начало рассмотрения</th>
+            <th>Заявка рассмотрена</th>
+            <th>Основания для отказа</th>
+        </tr>
+        {% for query in queries %}
+            <tr>
+                <td>{{ query.pk }}</td>
+                <td>{{ query.query_text }}</td>
+                <td>{{ query.topic_of_query }}</td>
+                <td>{{ query.status }}</td>
+                <td>{{ query.pub_date }}</td>
+                <td>{% if query.query_considered %}{{ query.query_considered }}{% else %}Не назначен{% endif %}</td>
+                <td>{% if query.accept_date %}{{ query.accept_date }}{% else %}{% endif %}</td>
+                <td>{% if query.complete_date %}{{ query.complete_date }}{% else %}{% endif %}</td>
+                <td>{% if query.denial_reason %}{{ query.denial_reason }}{% else %}{% endif %}</td>
+            </tr>
+        {% endfor %}
+
+
+    </table>
+{% endblock %}
+
+{% block pagination %}
+    {% get_pagination_block page_obj %}
+{% endblock %}
