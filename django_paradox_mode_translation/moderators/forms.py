@@ -24,3 +24,18 @@ class SendQueryForm(forms.ModelForm):
     class Meta:
         model = Query
         fields = ['query_text', 'topic']
+
+
+class QueryDenialForm(forms.ModelForm):
+
+    denial_reason = forms.CharField(
+        widget=forms.Textarea(attrs={
+
+        }),
+        required=True,
+        label="Основания для отказа"
+    )
+
+    class Meta:
+        model = Query
+        fields = ['denial_reason']
