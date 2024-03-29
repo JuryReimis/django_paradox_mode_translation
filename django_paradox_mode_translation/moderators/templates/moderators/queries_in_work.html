@@ -1,0 +1,27 @@
+{% extends 'translators_hub/base.html' %}
+
+{% block content %}
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th>Заявка №</th>
+            <th>Автор заявки</th>
+            <th>Текст заявки</th>
+            <th>Тема заявки</th>
+            <th>Дата размещения заявки</th>
+            <th>Начало рассмотрения</th>
+        </tr>
+        {% for query in queries %}
+            <tr>
+                <td>{{ query.pk }}</td>
+                <td>{{ query.query_text }}</td>
+                <td><a href="{{ query.query_author.get_absolute_url }}">{{ query.query_author }}</a></td>
+                <td>{{ query.topic }}</td>
+                <td>{{ query.pub_date }}</td>
+                <td>{{ query.accept_date }}</td>
+                <td>
+                    <a href="/">Принять решение</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
