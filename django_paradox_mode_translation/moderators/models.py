@@ -22,7 +22,7 @@ class Query(models.Model):
         verbose_name="Текст заявки"
     )
 
-    topic_of_query = models.ForeignKey(
+    topic = models.ForeignKey(
         to='Topic',
         on_delete=models.PROTECT,
         related_name='topic_queries'
