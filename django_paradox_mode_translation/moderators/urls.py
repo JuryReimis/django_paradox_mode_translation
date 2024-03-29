@@ -1,6 +1,7 @@
 from django.urls import path
 
-from moderators.views import ModeratorHomeView, SendQueryView, MyQueriesView, QueryBookingView, QueriesInWorkView
+from moderators.views import ModeratorHomeView, SendQueryView, MyQueriesView, QueryBookingView, QueriesInWorkView, \
+    QueryDetailView
 
 app_name = 'moderators'
 
@@ -9,5 +10,6 @@ urlpatterns = [
     path('send-query/', SendQueryView.as_view(), name='send_query'),
     path('my-queries/', MyQueriesView.as_view(), name='my_queries'),
     path('query-booking/', QueryBookingView.as_view(), name='query_booking'),
-    path('queries-in-work/', QueriesInWorkView.as_view(), name='queries_in_work')
+    path('queries-in-work/', QueriesInWorkView.as_view(), name='queries_in_work'),
+    path('query<int:pk>', QueryDetailView.as_view(), name='query_detail'),
 ]
