@@ -4,5 +4,5 @@
     <a href="{% url 'moderators:send_query' %}">Отправить заявку</a>
     <a href="{% url 'moderators:my_queries' %}">Оставленные заявки</a>
     <a href="{% url 'moderators:query_booking' %}">Рассмотреть заявки</a>
-    <a href="/">Заявки на рассмотрении</a>
+    <a href="{% url 'moderators:queries_in_work' %}">Заявки на рассмотрении</a>
 {% endblock %}
