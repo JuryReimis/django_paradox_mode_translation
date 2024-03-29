@@ -11,6 +11,8 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+    def get_absolute_url(self):
+        return self.userprofile.get_absolute_url()
 
 def get_image_user_path(instance, filename):
     return f'users/{instance.slug}/{filename}'
