@@ -1,0 +1,17 @@
+{% extends 'translators_hub/base.html' %}
+
+{% block content %}
+    {{ query.query_text }}
+    {{ query.query_author }}
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">Отказать</button>
+    </form>
+
+    <form method="post">
+        {% csrf_token %}
+        <button name="decision" value="Accept" type="submit">Принять</button>
+    </form>
+
+{% endblock %}
