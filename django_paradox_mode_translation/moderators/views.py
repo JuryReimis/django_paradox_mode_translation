@@ -1,4 +1,5 @@
-from django.shortcuts import render
+import django.utils.timezone
+from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 
 from django.views import View
@@ -16,7 +17,6 @@ class ModeratorHomeView(View):
 
 
 class SendQueryView(FormView):
-
     template_name = 'moderators/send_query.html'
     form_class = SendQueryForm
     success_url = reverse_lazy('moderators:home')
@@ -35,7 +35,6 @@ class SendQueryView(FormView):
 
 
 class MyQueriesView(ListView):
-
     model = Query
     paginator_class = CustomPaginator
     paginate_by = 10
@@ -43,7 +42,7 @@ class MyQueriesView(ListView):
     template_name = 'moderators/my_queries.html'
 
     def get_queryset(self):
-        my_queries = Query.objects.filter(query_author=self.request.user).select_related('topic')
+        my_queries = Query.objects.filter(query_author=self.request.user).select_related('query_considered', 'query_considered__userprofile', 'topic')
         return my_queries
 
 
@@ -55,12 +54,29 @@ class QueryBookingView(ListView):
     template_name = 'moderators/query_booking.html'
 
     def get_queryset(self):
-        queries = Query.objects.filter(status=None).select_related('query_author', 'topic').order_by('pub_date')
+        queries = Query.objects.filter(status=None).select_related('query_author', 'query_author__userprofile',
+                                                                   'topic').order_by('pub_date')
         return queries
 
     def post(self, request, *args, **kwargs):
         query = Query.objects.get(pk=request.POST.get('query_pk'))
-        query.query_author = request.user
+        query.query_considered = request.user
         query.status = Query.IN_WORK
+        query.accept_date = django.utils.timezone.now()
         query.save()
-        return render(request, template_name=self.template_name)
+        return redirect(reverse('moderators:query_booking'))
+
+
+class QueriesInWorkView(ListView):
+    model = Query
+    paginator_class = CustomPaginator
+    paginate_by = 10
+    context_object_name = 'queries'
+    template_name = 'moderators/queries_in_work.html'
+
+    def get_queryset(self):
+        queries = Query.objects.filter(query_considered=self.request.user).select_related('query_author',
+                                                                                          'query_author__userprofile',
+                                                                                          'topic').order_by(
+            'accept_date')
+        return queries
