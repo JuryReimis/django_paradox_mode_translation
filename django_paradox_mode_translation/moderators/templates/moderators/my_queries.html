@@ -19,9 +19,9 @@
                 <td>{{ query.pk }}</td>
                 <td>{{ query.query_text }}</td>
                 <td>{{ query.topic }}</td>
-                <td>{{ query.status }}</td>
+                <td>{{ query.get_status_display }}</td>
                 <td>{{ query.pub_date }}</td>
-                <td>{% if query.query_considered %}{{ query.query_considered }}{% else %}Не назначен{% endif %}</td>
+                <td>{% if query.query_considered %}<a href="{{ query.query_considered.get_absolute_url }}">{{ query.query_considered }}</a>{% else %}Не назначен{% endif %}</td>
                 <td>{% if query.accept_date %}{{ query.accept_date }}{% else %}{% endif %}</td>
                 <td>{% if query.complete_date %}{{ query.complete_date }}{% else %}{% endif %}</td>
                 <td>{% if query.denial_reason %}{{ query.denial_reason }}{% else %}{% endif %}</td>
