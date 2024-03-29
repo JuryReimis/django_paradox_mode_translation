@@ -62,7 +62,7 @@ class Query(models.Model):
 
     denial_reason = models.CharField(
         max_length=1000,
-        blank=False,
+        blank=True,
         default=None,
         null=True,
         verbose_name="Причина отказа"
@@ -70,12 +70,14 @@ class Query(models.Model):
 
     accept_date = models.DateTimeField(
         verbose_name="Заявка принята к рассмотрению",
+        blank=True,
         default=None,
         null=True,
     )
 
     complete_date = models.DateTimeField(
         verbose_name="Заявка рассмотрена",
+        blank=True,
         default=None,
         null=True,
     )
