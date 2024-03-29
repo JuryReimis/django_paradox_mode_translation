@@ -1,0 +1,27 @@
+{% extends 'translators_hub/base.html' %}
+
+{% block content %}
+    <table class="table table-bordered table-hover">
+        <tr>
+            <th>Заявка №</th>
+            <th>Автор заявки</th>
+            <th>Текст заявки</th>
+            <th>Тема заявки</th>
+        </tr>
+        {% for query in queries %}
+            <tr>
+                <td>{{ query.pk }}</td>
+                <td>{{ query.query_text }}</td>
+                <td>{{ query.query_author }}</td>
+                <td>{{ query.topic }}</td>
+                <td>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="query_pk" value="{{ query.pk }}">
+                        <button type="submit">Рассмотреть</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
