@@ -43,5 +43,24 @@ class MyQueriesView(ListView):
     template_name = 'moderators/my_queries.html'
 
     def get_queryset(self):
-        my_queries = Query.objects.filter(query_author=self.request.user).select_related('topic_of_query')
+        my_queries = Query.objects.filter(query_author=self.request.user).select_related('topic')
         return my_queries
+
+
+class QueryBookingView(ListView):
+    model = Query
+    paginator_class = CustomPaginator
+    paginate_by = 10
+    context_object_name = 'queries'
+    template_name = 'moderators/query_booking.html'
+
+    def get_queryset(self):
+        queries = Query.objects.filter(status=None).select_related('query_author', 'topic').order_by('pub_date')
+        return queries
+
+    def post(self, request, *args, **kwargs):
+        query = Query.objects.get(pk=request.POST.get('query_pk'))
+        query.query_author = request.user
+        query.status = Query.IN_WORK
+        query.save()
+        return render(request, template_name=self.template_name)
