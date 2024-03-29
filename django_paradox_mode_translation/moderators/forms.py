@@ -13,7 +13,7 @@ class SendQueryForm(forms.ModelForm):
         label="Текст заявки"
     )
 
-    topic_of_query = forms.ModelChoiceField(
+    topic = forms.ModelChoiceField(
         widget=forms.Select(attrs={
 
         }),
@@ -23,4 +23,4 @@ class SendQueryForm(forms.ModelForm):
 
     class Meta:
         model = Query
-        fields = ['query_text', 'topic_of_query']
+        fields = ['query_text', 'topic']
