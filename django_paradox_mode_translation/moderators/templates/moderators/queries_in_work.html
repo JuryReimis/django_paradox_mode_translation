@@ -19,7 +19,7 @@
                 <td>{{ query.pub_date }}</td>
                 <td>{{ query.accept_date }}</td>
                 <td>
-                    <a href="/">Принять решение</a>
+                    <a href="{% url 'moderators:query_detail' pk=query.pk %}">Принять решение</a>
                 </td>
             </tr>
         {% endfor %}
