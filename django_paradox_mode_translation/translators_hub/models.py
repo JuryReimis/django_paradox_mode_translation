@@ -317,6 +317,14 @@ class Game(models.Model):
         null=False
     )
 
+    description = models.CharField(
+        max_length=1000,
+        blank=True,
+        null=False,
+        default='',
+        verbose_name="Описание"
+    )
+
     def __str__(self):
         return self.game_name
 
