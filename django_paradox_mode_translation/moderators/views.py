@@ -7,7 +7,7 @@ from django.views import View
 from django.views.generic import FormView, ListView, DetailView
 from django.views.generic.edit import FormMixin
 
-from moderators.forms import SendQueryForm, QueryDenialForm
+from moderators.forms import SendQueryForm, QueryDenialForm, AddGameForm
 from moderators.models import Query
 from translators_hub.utils.custom_paginator import CustomPaginator
 
@@ -129,3 +129,16 @@ class QueryDetailView(FormMixin, DetailView):
         kwargs = super(QueryDetailView, self).get_form_kwargs()
         kwargs['instance'] = self.object
         return kwargs
+
+
+class AddGameView(FormView):
+    form_class = AddGameForm
+    template_name = 'moderators/add_game.html'
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            form.save()
+            return redirect('moderators:queries_in_work')
+        else:
+            return self.form_invalid(form)
