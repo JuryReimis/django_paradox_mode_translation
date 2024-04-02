@@ -1,7 +1,7 @@
 from django.urls import path
 
 from moderators.views import ModeratorHomeView, SendQueryView, MyQueriesView, QueryBookingView, QueriesInWorkView, \
-    QueryDetailView
+    QueryDetailView, AddGameView
 
 app_name = 'moderators'
 
@@ -12,4 +12,5 @@ urlpatterns = [
     path('query-booking/', QueryBookingView.as_view(), name='query_booking'),
     path('queries-in-work/', QueriesInWorkView.as_view(), name='queries_in_work'),
     path('query<int:pk>', QueryDetailView.as_view(), name='query_detail'),
+    path('add-game/', AddGameView.as_view(), name='add_game'),
 ]
