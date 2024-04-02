@@ -1,0 +1,11 @@
+{% extends 'translators_hub/base.html' %}
+
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">Добавить игру</button>
+    </form>
+
+{% endblock %}
