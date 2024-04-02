@@ -1,6 +1,7 @@
 from django import forms
 
 from moderators.models import Query, Topic
+from translators_hub.models import Game
 
 
 class SendQueryForm(forms.ModelForm):
@@ -39,3 +40,26 @@ class QueryDenialForm(forms.ModelForm):
     class Meta:
         model = Query
         fields = ['denial_reason']
+
+
+class AddGameForm(forms.ModelForm):
+
+    game_name = forms.CharField(
+        widget=forms.TextInput(attrs={
+
+        }),
+        required=True,
+        label="Название игры"
+    )
+
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={
+
+        }),
+        required=False,
+        label="Описание"
+    )
+
+    class Meta:
+        model = Game
+        fields = ['game_name', 'description']
