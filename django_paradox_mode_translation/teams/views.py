@@ -1,14 +1,17 @@
 from django.contrib import messages
+from django.contrib.postgres.search import SearchVector
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import generic
 
-from teams.forms import InviteUserForm, CreateTeamForm
+from teams.forms import InviteUserForm, CreateTeamForm, SearchTeamForm
 from teams.models import Teams, TeamInvites, TeamMembers
 from translators_hub.models import User
 
 from slugify import slugify
+
+from translators_hub.utils.custom_paginator import CustomPaginator
 
 
 class TeamsView(generic.ListView):
@@ -19,7 +22,7 @@ class TeamsView(generic.ListView):
         teams = self.request.user.membership.all()
         queryset = Teams.objects.filter(team_members__in=teams).prefetch_related('team_members')
         return queryset
-    
+
     def get(self, request, *args, **kwargs):
         return super(TeamsView, self).get(request, *args, **kwargs)
 
@@ -51,19 +54,19 @@ class CreateTeamView(generic.FormView):
             return self.form_invalid(form)
 
 
-
 class SendInviteView(generic.ListView):
     template_name = 'teams/invite_user.html'
     context_object_name = 'free_users'
 
     def get_queryset(self):
         team = Teams.objects.get(slug=self.kwargs.get('slug'))
-        free_users = User.objects.exclude(Q(membership__team=team) | Q(team_target_name__status=TeamInvites.NO_RESPONSE))
+        free_users = User.objects.exclude(
+            Q(membership__team=team) | Q(team_target_name__status=TeamInvites.NO_RESPONSE))
         return free_users
 
     def get(self, request, *args, **kwargs):
         form = InviteUserForm()
-        self.extra_context = {'form': form, 'slug':kwargs.get('slug')}
+        self.extra_context = {'form': form, 'slug': kwargs.get('slug')}
         return super(SendInviteView, self).get(request, *args, **kwargs)
 
     def post(self, request, slug, *args, **kwargs):
@@ -99,3 +102,29 @@ class TeamInvitesHandler(generic.View):
             error_message = "Ошибка чтения значения кнопки, повторите попытку"
             messages.add_message(request=request, level=messages.ERROR, message=error_message)
         return redirect(reverse('translators_hub:invites', kwargs={'slug': request.user.userprofile.slug}))
+
+
+class SearchTeamView(generic.edit.FormMixin, generic.ListView):
+    template_name = 'teams/search_team.html'
+    context_object_name = 'teams'
+    paginate_by = 15
+    paginator_class = CustomPaginator
+
+    form_class = SearchTeamForm
+
+    def get_queryset(self):
+        search_vector = SearchVector('team_title', 'description')
+        search_str = self.request.GET.get('search_str')
+        filters = ~Q(team_members__user=self.request.user)
+        if search_str:
+            filters &= Q(search=search_str)
+        if self.request.GET.get('is_open'):
+            filters &= Q(is_open=True)
+        teams = Teams.objects.annotate(search=search_vector).filter(filters).prefetch_related('team_members')
+        return teams
+
+    def get(self, request, *args, **kwargs):
+        self.initial = request.GET
+        form = self.get_form()
+        self.extra_context = {'form': form}
+        return super(SearchTeamView, self).get(request, *args, **kwargs)
