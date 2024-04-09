@@ -1,0 +1,13 @@
+{% extends 'translators_hub/base.html' %}
+
+{% block content %}
+    <form method="get">
+        {{ form }}
+        <button type="submit">Поиск</button>
+    </form>
+
+    {% for team in teams %}
+        {{ team.team_title }}
+        {{ team.team_members.all|length }}
+    {% endfor %}
+{% endblock %}
