@@ -27,11 +27,22 @@ class Teams(models.Model):
         verbose_name='Репутация'
     )
 
+    is_open = models.BooleanField(
+        blank=False,
+        default=True,
+        null=False,
+        verbose_name="Открыт набор"
+    )
+
     def get_absolute_url(self):
         return reverse('teams:team_detail', kwargs={'slug': self.slug})
 
     def __str__(self):
         return f'Команда {self.team_title}'
+
+    class Meta:
+        verbose_name = "Команда"
+        verbose_name_plural = "Команды"
 
 
 class TeamMembers(models.Model):
