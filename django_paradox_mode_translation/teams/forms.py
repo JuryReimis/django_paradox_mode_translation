@@ -49,3 +49,21 @@ class InviteUserForm(forms.ModelForm):
     class Meta:
         model = TeamInvites
         fields = ['text_invite']
+
+
+class SearchTeamForm(forms.Form):
+
+    search_str = forms.CharField(
+        widget=forms.TextInput(attrs={
+
+        }),
+        label="Поиск"
+    )
+
+    is_open = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={
+
+        }),
+        required=False,
+        label="Происходит набор"
+    )
