@@ -4,9 +4,11 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import generic
 
-from teams.forms import InviteUserForm
+from teams.forms import InviteUserForm, CreateTeamForm
 from teams.models import Teams, TeamInvites, TeamMembers
 from translators_hub.models import User
+
+from slugify import slugify
 
 
 class TeamsView(generic.ListView):
@@ -33,6 +35,21 @@ class TeamPageView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         return super(TeamPageView, self).get(request, *args, **kwargs)
+
+
+class CreateTeamView(generic.FormView):
+    form_class = CreateTeamForm
+    template_name = 'teams/create_team.html'
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            form.instance.slug = slugify(form.instance.team_title)
+            form.save(request.user)
+            return redirect('teams:home')
+        else:
+            return self.form_invalid(form)
+
 
 
 class SendInviteView(generic.ListView):
