@@ -49,6 +49,13 @@ class TeamMembers(models.Model):
 
     role = models.BooleanField(blank=True, default=None, null=True, choices=ROLES, verbose_name="Роль в команде")
 
+    def __str__(self):
+        return f'Член команды {self.team} - {self.user}, роль - {self.get_role_display()}'
+
+    class Meta:
+        verbose_name = "Член команды"
+        verbose_name_plural = "Члены команды"
+
 
 class TeamInvites(models.Model):
     NO_RESPONSE = 'no_resp'
