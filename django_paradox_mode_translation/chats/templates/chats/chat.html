@@ -1,0 +1,36 @@
+{% load static %}
+
+{% block chat %}
+    <script src="{% static 'chats/js/chatsWebSocket.js' %}"></script>
+    {% for chat in user_chats %}
+        <div class="" tabindex="-1" role="dialog" aria-labelledby="chatModalLabel"
+             aria-hidden="true">
+
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="chatModalLabel">Чат {{ chat.title }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="chat-messages" id="{{ chat.slug }}-chat-messages">
+                            {% for message in chat.messages.all %}
+                                <p><b>{{ message.author }}:</b> {{ message.body }}</p>
+                            {% endfor %}
+
+                        </div>
+                        <form id="chat-form-{{ chat.slug }}">
+                            {{ form }}
+                            <button type="submit" class="btn btn-primary">Отправить</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>handshake('{{ chat.slug }}')</script>
+    {% endfor %}
+{% endblock %}
+
