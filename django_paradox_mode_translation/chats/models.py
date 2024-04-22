@@ -1,4 +1,5 @@
 from django.db import models
+from slugify import slugify
 
 
 class Chat(models.Model):
@@ -40,6 +41,24 @@ class PrivateChat(Chat):
 
 
 class TeamChat(Chat):
+
+    team = models.OneToOneField(
+        to='teams.Teams',
+        on_delete=models.CASCADE,
+        null=False,
+        related_name='team_chat',
+        verbose_name="Команда"
+    )
+
+    @classmethod
+    def get_chat_params(cls, team_title: str):
+        default_name = "Чат команды"
+        chat_title = f'{default_name} {team_title}'
+        chat_slug = slugify(chat_title)
+        return {'title': chat_title, 'slug': chat_slug}
+
+    def __str__(self):
+        return f'Чат команды {self.team.team_title}'
 
     class Meta:
         verbose_name = "Командный чат"
