@@ -2,7 +2,7 @@
 
 {% block chat %}
     <script src="{% static 'chats/js/chatsWebSocket.js' %}"></script>
-    {% for chat in user_chats %}
+    {% for chat in private_chats %}
         <div class="" tabindex="-1" role="dialog" aria-labelledby="chatModalLabel"
              aria-hidden="true">
 
@@ -16,13 +16,14 @@
                     </div>
                     <div class="modal-body">
                         <div class="chat-messages" id="{{ chat.slug }}-chat-messages">
-                            {% for message in chat.messages.all %}
+                            {% for message in chat.private_messages.all %}
                                 <p><b>{{ message.author }}:</b> {{ message.body }}</p>
                             {% endfor %}
 
                         </div>
                         <form id="chat-form-{{ chat.slug }}">
-                            {{ form }}
+                            <input type="hidden" name="chat type" value="{{ chat.get_chat_type }}">
+                            {{ private_form }}
                             <button type="submit" class="btn btn-primary">Отправить</button>
                         </form>
 
