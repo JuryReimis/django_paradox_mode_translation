@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'translators_hub.apps.TranslatorsHubConfig',
     'teams.apps.TeamsConfig',
     'moderators.apps.ModeratorsConfig',
+    'chats.apps.ChatsConfig',
     'channels',
 ]
 
