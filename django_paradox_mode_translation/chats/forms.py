@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import timezone
 
-from chats.models import Message
+from chats.models import PrivateMessage, TeamMessage
 
 
 class SendMessageForm(forms.ModelForm):
@@ -25,5 +25,16 @@ class SendMessageForm(forms.ModelForm):
         return instance
 
     class Meta:
-        model = Message
         fields = ['body']
+
+
+class PrivateMessageForm(SendMessageForm):
+
+    class Meta(SendMessageForm.Meta):
+        model = PrivateMessage
+
+
+class TeamMessageForm(SendMessageForm):
+
+    class Meta(SendMessageForm.Meta):
+        model = TeamMessage
