@@ -13,9 +13,15 @@ from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 
-from translators_hub.routing import websocket_urlpatterns
+from translators_hub.routing import websocket_urlpatterns as hub_websocket
+from chats.routing import websocket_urlpatterns as chat_websocket
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_paradox_mode_translation.settings')
+
+websocket_urlpatterns = [
+    *hub_websocket,
+    *chat_websocket
+]
 
 application = ProtocolTypeRouter(
     {
