@@ -42,6 +42,8 @@ class PrivateChat(Chat):
 
 class TeamChat(Chat):
 
+    CHAT_TYPE = 'team'
+
     team = models.OneToOneField(
         to='teams.Teams',
         on_delete=models.CASCADE,
