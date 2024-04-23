@@ -30,6 +30,7 @@ function handshake(chat_url) {
             data: $(e.target).serialize(),
             success: function (response) {
                 console.log('response - ok')
+                $(e.target).trigger('reset')
             },
 
             error: function (error) {
