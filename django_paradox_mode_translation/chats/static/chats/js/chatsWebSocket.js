@@ -1,8 +1,8 @@
 // chat_url = document.getElementById('chat').value
 
-function handshake(chat_url) {
-    let socket = new WebSocket('ws://' + window.location.host + '/' + 'ws/' + 'chats/' + chat_url + '/')
-    console.log(chat_url)
+function handshake(chatUrl) {
+    let socket = new WebSocket('ws://' + window.location.host + '/' + 'ws/' + 'chats/' + chatUrl + '/')
+    console.log(chatUrl)
 
     socket.onmessage = function (e) {
 
@@ -10,16 +10,21 @@ function handshake(chat_url) {
         let message = data.body;
         let author = data.author;
         let pub_date = data.pub_date
-        let chatMessages = $('#' + chat_url + '-chat-messages');
+        let chatMessages = $('#' + chatUrl + '-chat-messages');
         chatMessages.append((`<p><p>${pub_date}</p><b>${author}:</b> ${message}</p>`))
     }
 
-    let form = $('#chat-form-' + chat_url)
+    let openButton = $('#open-button-' + chatUrl)
+    openButton.click(function () {
+        scrollToPosition(4, chatUrl)
+    })
+
+    let form = $('#chat-form-' + chatUrl)
 
     form.submit(function (e) {
         const csrfToken = Cookies.get('csrftoken')
         e.preventDefault()
-        const full_url = 'http://' + window.location.host + '/' + 'chats/' + chat_url + '/'
+        const full_url = 'http://' + window.location.host + '/' + 'chats/' + chatUrl + '/'
 
         $.ajax({
             url: full_url,
