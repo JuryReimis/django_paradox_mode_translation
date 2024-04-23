@@ -6,43 +6,112 @@
         <script src="{% static 'chats/js/scrollFunctions.js' %}"></script>
         <script src="{% static 'chats/js/chatsWebSocket.js' %}"></script>
         <div class="container fixed-bottom bg-secondary">
-            <div class="d-flex flex-row mb-3">
-                {% for chat in private_chats %}
+            <div class="row" id="test">
+                <div class="col">
                     <div class="col p-1">
-                        <h5 class="card-title" id="chatModalLabel">
-                            <button id="open-button-{{ chat.slug }}" class="btn btn-primary" type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#collapse-{{ chat.slug }}"
-                                    aria-expanded="false" aria-controls="collapse-{{ chat.slug }}">
-                                {{ chat.title }}
+                        <h5 class="card-title">
+                            <button id="privateChatsOpenButton" class="btn btn-primary bg-dark" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#privateChatsCollapse"
+                                    aria-expanded="false" aria-controls="privateChatsCollapse">
+                                Личные чаты
                             </button>
                         </h5>
                     </div>
-                {% endfor %}
-            </div>
 
-            <div class="d-flex flex-row">
-                {% for chat in private_chats %}
-                    <div id="collapse-{{ chat.slug }}" class="collapse col overflow-y-auto hidden"
-                         style="max-height: 50vh"
-                         data-bs-parent="#privateChatsAccordion">
-                        <div class="overflow-y-auto">
-                            <div class="chat-messages" id="{{ chat.slug }}-chat-messages">
-                                {% for message in chat.private_messages.all %}
-                                    <p id="{{ message.pk }}"><b>{{ message.author }}:</b> {{ message.body }}</p>
-                                {% endfor %}
-                            </div>
-                            <form id="chat-form-{{ chat.slug }}">
-                                <input type="hidden" name="chat type" value="{{ chat.get_chat_type }}">
-                                {{ private_form }}
-                                <button type="submit" class="btn btn-primary">Отправить</button>
-                            </form>
-                        </div>
+                </div>
+
+                <div class="col">
+                    <div class="col p-1">
+                        <h5 class="card-title">
+                            <button id="teamChatsOpenButton" class="btn btn-primary bg-dark" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#teamChatsCollapse"
+                                    aria-expanded="false" aria-controls="teamChatsCollapse">
+                                Командные чаты
+                            </button>
+                        </h5>
                     </div>
-                    <script>handshake('{{ chat.slug }}')</script>
-                {% endfor %}
+                </div>
             </div>
 
+
+            <div class="collapse hidden container" id="privateChatsCollapse">
+                <div class="d-flex flex-row mb-3">
+                    {% for chat in private_chats %}
+                        <div class="col p-1">
+                            <h5 class="card-title" id="chatModalLabel">
+                                <button id="open-button-{{ chat.slug }}" class="btn btn-primary" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-{{ chat.slug }}"
+                                        aria-expanded="false" aria-controls="collapse-{{ chat.slug }}">
+                                    {{ chat.title }}
+                                </button>
+                            </h5>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex flex-row">
+                    {% for chat in private_chats %}
+                        <div id="collapse-{{ chat.slug }}" class="collapse col overflow-y-auto hidden"
+                             style="max-height: 50vh">
+                            <div class="overflow-y-auto">
+                                <div class="chat-messages" id="{{ chat.slug }}-chat-messages">
+                                    {% for message in chat.private_messages.all %}
+                                        <p id="{{ chat.slug }}-{{ message.pk }}"><b>{{ message.author }}:</b> {{ message.body }}</p>
+                                    {% endfor %}
+                                </div>
+                                <form id="chat-form-{{ chat.slug }}">
+                                    <input type="hidden" name="chat type" value="{{ chat.get_chat_type }}">
+                                    {{ private_form }}
+                                    <button type="submit" class="btn btn-primary">Отправить</button>
+                                </form>
+                            </div>
+
+                        </div>
+                        <script>handshake('{{ chat.slug }}')</script>
+                    {% endfor %}
+                </div>
+
+
+            </div>
+            <div class="collapse hidden container" id="teamChatsCollapse">
+                <div class="d-flex flex-row mb-3">
+                    {% for chat in team_chats %}
+                        <div class="col p-1">
+                            <h5 class="card-title" id="teamModalLabel">
+                                <button id="open-button-{{ chat.slug }}" class="btn btn-primary" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapse-{{ chat.slug }}"
+                                        aria-expanded="false" aria-controls="collapse-{{ chat.slug }}">
+                                    {{ chat.title }}
+                                </button>
+                            </h5>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex flex-row">
+                    {% for chat in team_chats %}
+                        <div id="collapse-{{ chat.slug }}" class="collapse col overflow-y-auto hidden"
+                             style="max-height: 50vh">
+                            <div class="overflow-y-auto">
+                                <div class="chat-messages" id="{{ chat.slug }}-chat-messages">
+                                    {% for message in chat.team_messages.all %}
+                                        <p id="{{ chat.slug }}-{{ message.pk }}"><b>{{ message.author }}:</b> {{ message.body }}</p>
+                                    {% endfor %}
+                                </div>
+                                <form id="chat-form-{{ chat.slug }}">
+                                    <input type="hidden" name="chat type" value="{{ chat.get_chat_type }}">
+                                    {{ private_form }}
+                                    <button type="submit" class="btn btn-primary">Отправить</button>
+                                </form>
+                            </div>
+
+                        </div>
+                        <script>handshake('{{ chat.slug }}')</script>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     {% endblock %}
 {% endif %}
