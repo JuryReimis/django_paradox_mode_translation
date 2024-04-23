@@ -9,6 +9,12 @@ register = Library()
 @register.inclusion_tag(takes_context=True, filename='chats/chat.html')
 def get_chats(context):
     user = context['user']
+    if user.is_anonymous:
+        context = {
+            'anonym': True
+        }
+        return context
+
     private_chats = user.private_chats.all().prefetch_related('private_messages', 'private_messages__author')
     private_form = PrivateMessageForm()
     team_chats = []
