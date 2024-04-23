@@ -6,7 +6,15 @@
         <script src="{% static 'chats/js/scrollFunctions.js' %}"></script>
         <script src="{% static 'chats/js/chatsWebSocket.js' %}"></script>
         <div class="container fixed-bottom bg-secondary">
-            <div class="row" id="test">
+            <div class="row">
+                <div class="col-1">
+                    <button class="btn bg-info" id="chatsOpenButton" data-bs-target="#chatsArea"
+                            data-bs-toggle="collapse" type="button" aria-controls="chatsArea">
+                        Чаты
+                    </button>
+                </div>
+            </div>
+            <div class="row collapse hidden" id="chatsArea">
                 <div class="col">
                     <div class="col p-1">
                         <h5 class="card-title">
@@ -57,7 +65,8 @@
                             <div class="overflow-y-auto">
                                 <div class="chat-messages" id="{{ chat.slug }}-chat-messages">
                                     {% for message in chat.private_messages.all %}
-                                        <p id="{{ chat.slug }}-{{ message.pk }}"><b>{{ message.author }}:</b> {{ message.body }}</p>
+                                        <p id="{{ chat.slug }}-{{ message.pk }}">
+                                            <b>{{ message.author }}:</b> {{ message.body }}</p>
                                     {% endfor %}
                                 </div>
                                 <form id="chat-form-{{ chat.slug }}">
@@ -97,7 +106,8 @@
                             <div class="overflow-y-auto">
                                 <div class="chat-messages" id="{{ chat.slug }}-chat-messages">
                                     {% for message in chat.team_messages.all %}
-                                        <p id="{{ chat.slug }}-{{ message.pk }}"><b>{{ message.author }}:</b> {{ message.body }}</p>
+                                        <p id="{{ chat.slug }}-{{ message.pk }}">
+                                            <b>{{ message.author }}:</b> {{ message.body }}</p>
                                     {% endfor %}
                                 </div>
                                 <form id="chat-form-{{ chat.slug }}">
