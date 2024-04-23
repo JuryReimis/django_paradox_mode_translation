@@ -3,30 +3,33 @@
 {% if anonym %}
 {% else %}
     {% block chat %}
+        <script src="{% static 'chats/js/scrollFunctions.js' %}"></script>
         <script src="{% static 'chats/js/chatsWebSocket.js' %}"></script>
-        <div class="container">
-
+        <div class="container fixed-bottom bg-secondary">
             <div class="d-flex flex-row mb-3">
                 {% for chat in private_chats %}
                     <div class="col p-1">
                         <h5 class="card-title" id="chatModalLabel">
-                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                            <button id="open-button-{{ chat.slug }}" class="btn btn-primary" type="button"
+                                    data-bs-toggle="collapse"
                                     data-bs-target="#collapse-{{ chat.slug }}"
                                     aria-expanded="false" aria-controls="collapse-{{ chat.slug }}">
-                                Чат {{ chat.title }}
+                                {{ chat.title }}
                             </button>
                         </h5>
                     </div>
                 {% endfor %}
             </div>
-            <div class="row">
+
+            <div class="d-flex flex-row">
                 {% for chat in private_chats %}
-                    <div class="col-auto p-2">
-                        <div id="collapse-{{ chat.slug }}" class="collapse overflow-y-scroll hidden"
-                             data-bs-parent="#privateChatsAccordion">
+                    <div id="collapse-{{ chat.slug }}" class="collapse col overflow-y-auto hidden"
+                         style="max-height: 50vh"
+                         data-bs-parent="#privateChatsAccordion">
+                        <div class="overflow-y-auto">
                             <div class="chat-messages" id="{{ chat.slug }}-chat-messages">
                                 {% for message in chat.private_messages.all %}
-                                    <p><b>{{ message.author }}:</b> {{ message.body }}</p>
+                                    <p id="{{ message.pk }}"><b>{{ message.author }}:</b> {{ message.body }}</p>
                                 {% endfor %}
                             </div>
                             <form id="chat-form-{{ chat.slug }}">
@@ -36,10 +39,10 @@
                             </form>
                         </div>
                     </div>
-
                     <script>handshake('{{ chat.slug }}')</script>
                 {% endfor %}
             </div>
+
         </div>
     {% endblock %}
 {% endif %}
