@@ -30,7 +30,9 @@ class SendMessageView(FormView):
                 'author': request.user.username,
                 'pub_date': formatted_datetime
             })
-        return JsonResponse({})
+            return JsonResponse({'success': 'ok'})
+        else:
+            return JsonResponse({'success': 'fault'})
 
     def get_form(self, form_class=None, chat_type=None):
         if chat_type:
