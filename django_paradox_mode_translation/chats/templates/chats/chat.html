@@ -1,37 +1,46 @@
 {% load static %}
 
-{% block chat %}
-    <script src="{% static 'chats/js/chatsWebSocket.js' %}"></script>
-    {% for chat in private_chats %}
-        <div class="" tabindex="-1" role="dialog" aria-labelledby="chatModalLabel"
-             aria-hidden="true">
+{% if anonym %}
+{% else %}
+    {% block chat %}
+        <script src="{% static 'chats/js/chatsWebSocket.js' %}"></script>
+        <div class="container">
 
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="chatModalLabel">Чат {{ chat.title }}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+            <div class="d-flex flex-row mb-3">
+                {% for chat in private_chats %}
+                    <div class="col p-1">
+                        <h5 class="card-title" id="chatModalLabel">
+                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapse-{{ chat.slug }}"
+                                    aria-expanded="false" aria-controls="collapse-{{ chat.slug }}">
+                                Чат {{ chat.title }}
+                            </button>
+                        </h5>
                     </div>
-                    <div class="modal-body">
-                        <div class="chat-messages" id="{{ chat.slug }}-chat-messages">
-                            {% for message in chat.private_messages.all %}
-                                <p><b>{{ message.author }}:</b> {{ message.body }}</p>
-                            {% endfor %}
-
+                {% endfor %}
+            </div>
+            <div class="row">
+                {% for chat in private_chats %}
+                    <div class="col-auto p-2">
+                        <div id="collapse-{{ chat.slug }}" class="collapse overflow-y-scroll hidden"
+                             data-bs-parent="#privateChatsAccordion">
+                            <div class="chat-messages" id="{{ chat.slug }}-chat-messages">
+                                {% for message in chat.private_messages.all %}
+                                    <p><b>{{ message.author }}:</b> {{ message.body }}</p>
+                                {% endfor %}
+                            </div>
+                            <form id="chat-form-{{ chat.slug }}">
+                                <input type="hidden" name="chat type" value="{{ chat.get_chat_type }}">
+                                {{ private_form }}
+                                <button type="submit" class="btn btn-primary">Отправить</button>
+                            </form>
                         </div>
-                        <form id="chat-form-{{ chat.slug }}">
-                            <input type="hidden" name="chat type" value="{{ chat.get_chat_type }}">
-                            {{ private_form }}
-                            <button type="submit" class="btn btn-primary">Отправить</button>
-                        </form>
-
                     </div>
-                </div>
+
+                    <script>handshake('{{ chat.slug }}')</script>
+                {% endfor %}
             </div>
         </div>
-        <script>handshake('{{ chat.slug }}')</script>
-    {% endfor %}
-{% endblock %}
+    {% endblock %}
+{% endif %}
 
