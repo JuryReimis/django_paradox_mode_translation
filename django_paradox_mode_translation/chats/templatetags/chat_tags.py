@@ -30,7 +30,7 @@ def get_chats(context):
     context = {
         'user': user,
         'private_chats': private_chats,
-        'teams_chats': team_chats if team_chats else None,
+        'team_chats': team_chats if team_chats else None,
         'private_form': private_form
     }
     return context
