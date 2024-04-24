@@ -1,5 +1,12 @@
 
 
+$(document).ready(function () {
+                $('#chatsOpenButton').click(function () {
+                    $('.collapse.show').collapse('hide');
+                });
+            });
+
+
 function scrollToPosition(elementId, chatUrl) {
     const element = $('#' + chatUrl + '-' + elementId)
     if (element.length) {
