@@ -56,7 +56,7 @@ class TeamMembers(models.Model):
 
     team = models.ForeignKey(to=Teams, on_delete=models.CASCADE, related_name='team_members', verbose_name='Команда')
 
-    user = models.ForeignKey(to='translators_hub.User', on_delete=models.CASCADE, related_name='membership')
+    user = models.ForeignKey(to='auth_app.User', on_delete=models.CASCADE, related_name='membership')
 
     role = models.BooleanField(blank=True, default=None, null=True, choices=ROLES, verbose_name="Роль в команде")
 
@@ -84,13 +84,13 @@ class TeamInvites(models.Model):
     )
 
     sender = models.ForeignKey(
-        to='translators_hub.User',
+        to='auth_app.User',
         on_delete=models.CASCADE,
         related_name='team_sender_name'
     )
 
     target = models.ForeignKey(
-        to='translators_hub.User',
+        to='auth_app.User',
         on_delete=models.CASCADE,
         related_name='team_target_name'
     )

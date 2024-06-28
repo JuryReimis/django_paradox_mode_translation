@@ -30,10 +30,10 @@ DEBUG = True if os.getenv('DEBUG').lower() == 'true' else False
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
-AUTH_USER_MODEL = 'translators_hub.User'
+AUTH_USER_MODEL = 'auth_app.User'
 
-LOGIN_REDIRECT_URL = reverse_lazy('translators_hub:home')
-LOGOUT_REDIRECT_URL = reverse_lazy('translators_hub:home')
+# LOGIN_REDIRECT_URL = reverse_lazy('translators_hub:home')
+# LOGOUT_REDIRECT_URL = reverse_lazy('translators_hub:home')
 
 # Application definition
 
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
     'debug_toolbar',
+    'auth_app.apps.AuthAppConfig',
     'translators_hub.apps.TranslatorsHubConfig',
     'teams.apps.TeamsConfig',
     'moderators.apps.ModeratorsConfig',

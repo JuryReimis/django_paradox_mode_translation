@@ -1,83 +1,5 @@
 from django.db import models
 from django.urls import reverse
-from django.contrib.auth.models import AbstractUser
-
-from django.utils.translation import gettext_lazy as _
-
-
-class User(AbstractUser):
-    email = models.EmailField(_("email address"), blank=False, unique=True, null=False)
-
-    def __str__(self):
-        return self.username
-
-    def get_absolute_url(self):
-        return self.userprofile.get_absolute_url()
-
-def get_image_user_path(instance, filename):
-    return f'users/{instance.slug}/{filename}'
-
-
-class UserProfile(models.Model):
-    user = models.OneToOneField(
-        to=User,
-        on_delete=models.CASCADE,
-    )
-
-    slug = models.SlugField(
-        blank=False,
-        db_index=True,
-        unique=True,
-        verbose_name="URL"
-    )
-
-    titles = models.ManyToManyField(
-        to='Titles',
-        blank=True,
-        verbose_name="Награды",
-    )
-
-    description = models.TextField(
-        blank=True,
-        default="",
-        null=True,
-        verbose_name="Немного о себе",
-    )
-
-    experience = models.TextField(
-        null=True,
-        default="",
-        verbose_name="Опыт"
-    )
-
-    profile_image = models.ImageField(
-        upload_to=get_image_user_path,
-        default='defaults/noavatar.png',
-        null=False,
-        verbose_name="Аватар",
-    )
-
-    reputation = models.IntegerField(
-        default=0,
-        blank=False,
-        verbose_name="Репутация",
-    )
-
-    def __str__(self):
-        return f"Профиль {self.user}"
-
-    class Meta:
-        verbose_name = "Профиль"
-        verbose_name_plural = "Профили"
-
-    def get_absolute_url(self):
-        return reverse('translators_hub:profile', kwargs={'slug': self.slug})
-
-    def get_fields_in_dict(self, ):
-        fields_dict = {}
-        for field in self._meta.fields:
-            fields_dict[field.name] = field.value_from_object(self)
-        return fields_dict
 
 
 def get_image_project_path(instance, filename):
@@ -220,7 +142,7 @@ class Roles(models.Model):
     ]
 
     user = models.ForeignKey(
-        to=User,
+        to='auth_app.User',
         on_delete=models.CASCADE,
         blank=True,
         related_name='roles',
@@ -271,13 +193,13 @@ class Invites(models.Model):
     )
 
     sender = models.ForeignKey(
-        to=User,
+        to='auth_app.User',
         on_delete=models.CASCADE,
         related_name='sender_name'
     )
 
     target = models.ForeignKey(
-        to=User,
+        to='auth_app.User',
         on_delete=models.CASCADE,
         related_name='target_name'
     )
@@ -353,7 +275,7 @@ class Titles(models.Model):
 
 class AbstractComments(models.Model):
     author = models.ForeignKey(
-        to=User,
+        to='auth_app.User',
         on_delete=models.SET_NULL,
         null=True,
         related_name='posted_comments'
@@ -391,143 +313,143 @@ class AbstractComments(models.Model):
         abstract = True
 
 
-class ProfileComments(AbstractComments):
-    author = models.ForeignKey(
-        to=User,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='posted_profile_comments'
-    )
-
-    target = models.ForeignKey(
-        to=UserProfile,
-        on_delete=models.CASCADE,
-        null=True,
-        related_name='profile_comments'
-    )
-
-    def get_reactions(self) -> [int, int]:
-        likes = 0
-        dislikes = 0
-        for reaction in self.profile_comment_reactions.all():
-            if reaction.reaction is True:
-                likes += 1
-            elif reaction.reaction is False:
-                dislikes += 1
-        return likes, dislikes
-
-    def __str__(self):
-        return f'Комментарий пользователя {self.author} в профиле {self.target}'
-
-    class Meta:
-        verbose_name = "Комментарий в профиле"
-        verbose_name_plural = "Комментарии в профиле"
-
-
-class ProfileCommentsReaction(models.Model):
-    LIKE = True
-    DISLIKE = False
-
-    REACTION = [
-        (LIKE, "Лайк"),
-        (DISLIKE, "Дизлайк"),
-        (None, "Нет реакции"),
-    ]
-
-    author = models.ForeignKey(
-        to=User,
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Автор реакции'
-    )
-
-    target = models.ForeignKey(
-        to=ProfileComments,
-        on_delete=models.CASCADE,
-        related_name='profile_comment_reactions',
-        verbose_name='Комментарий'
-    )
-
-    reaction = models.BooleanField(
-        choices=REACTION,
-        null=True,
-        blank=True,
-        verbose_name='Реакция на комментарий'
-    )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['author', 'target'], name='unique_profile_comment_reaction')
-        ]
-        verbose_name = "Реакция на комментарий"
-        verbose_name_plural = "Реакции на комментарии"
+# class ProfileComments(AbstractComments):
+#     author = models.ForeignKey(
+#         to='auth_app.User',
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         related_name='posted_profile_comments'
+#     )
+#
+#     target = models.ForeignKey(
+#         to='auth_app.UserProfile',
+#         on_delete=models.CASCADE,
+#         null=True,
+#         related_name='profile_comments'
+#     )
+#
+#     def get_reactions(self) -> [int, int]:
+#         likes = 0
+#         dislikes = 0
+#         for reaction in self.profile_comment_reactions.all():
+#             if reaction.reaction is True:
+#                 likes += 1
+#             elif reaction.reaction is False:
+#                 dislikes += 1
+#         return likes, dislikes
+#
+#     def __str__(self):
+#         return f'Комментарий пользователя {self.author} в профиле {self.target}'
+#
+#     class Meta:
+#         verbose_name = "Комментарий в профиле"
+#         verbose_name_plural = "Комментарии в профиле"
 
 
-class ProjectComments(AbstractComments):
-    author = models.ForeignKey(
-        to=User,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='posted_project_comments'
-    )
+# class ProfileCommentsReaction(models.Model):
+#     LIKE = True
+#     DISLIKE = False
+#
+#     REACTION = [
+#         (LIKE, "Лайк"),
+#         (DISLIKE, "Дизлайк"),
+#         (None, "Нет реакции"),
+#     ]
+#
+#     author = models.ForeignKey(
+#         to='auth_app.User',
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         verbose_name='Автор реакции'
+#     )
+#
+#     target = models.ForeignKey(
+#         to=ProfileComments,
+#         on_delete=models.CASCADE,
+#         related_name='profile_comment_reactions',
+#         verbose_name='Комментарий'
+#     )
+#
+#     reaction = models.BooleanField(
+#         choices=REACTION,
+#         null=True,
+#         blank=True,
+#         verbose_name='Реакция на комментарий'
+#     )
+#
+#     class Meta:
+#         constraints = [
+#             models.UniqueConstraint(fields=['author', 'target'], name='unique_profile_comment_reaction')
+#         ]
+#         verbose_name = "Реакция на комментарий"
+#         verbose_name_plural = "Реакции на комментарии"
 
-    target = models.ForeignKey(
-        to=Translation,
-        on_delete=models.CASCADE,
-        null=True,
-        related_name='project_comments',
-    )
 
-    def get_reactions(self) -> [int, int]:
-        likes = 0
-        dislikes = 0
-        for reaction in self.project_comment_reactions.all():
-            if reaction.reaction is True:
-                likes += 1
-            elif reaction.reaction is False:
-                dislikes += 1
-        return likes, dislikes
+# class ProjectComments(AbstractComments):
+#     author = models.ForeignKey(
+#         to='auth_app.User',
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         related_name='posted_project_comments'
+#     )
+#
+#     target = models.ForeignKey(
+#         to=Translation,
+#         on_delete=models.CASCADE,
+#         null=True,
+#         related_name='project_comments',
+#     )
+#
+#     def get_reactions(self) -> [int, int]:
+#         likes = 0
+#         dislikes = 0
+#         for reaction in self.project_comment_reactions.all():
+#             if reaction.reaction is True:
+#                 likes += 1
+#             elif reaction.reaction is False:
+#                 dislikes += 1
+#         return likes, dislikes
+#
+#     def __str__(self):
+#         return f'Комментарий пользователя {self.author} под проектом {self.target}'
+#
+#     class Meta:
+#         verbose_name = "Комментарий под проектом"
+#         verbose_name_plural = "Комментарии под проектом"
 
-    def __str__(self):
-        return f'Комментарий пользователя {self.author} под проектом {self.target}'
 
-    class Meta:
-        verbose_name = "Комментарий под проектом"
-        verbose_name_plural = "Комментарии под проектом"
-
-
-class ProjectCommentsReaction(models.Model):
-    LIKE = True
-    DISLIKE = False
-
-    REACTION = [
-        (LIKE, "Лайк"),
-        (DISLIKE, "Дизлайк"),
-        (None, "Нет реакции"),
-    ]
-
-    author = models.ForeignKey(
-        to=User,
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Автор реакции'
-    )
-
-    target = models.ForeignKey(
-        to=ProjectComments,
-        on_delete=models.CASCADE,
-        related_name='project_comment_reactions',
-        verbose_name='Комментарий'
-    )
-
-    reaction = models.BooleanField(
-        choices=REACTION,
-        null=True,
-        blank=True,
-        verbose_name='Реакция на комментарий'
-    )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['author', 'target'], name='unique_project_comment_reaction')
-        ]
+# class ProjectCommentsReaction(models.Model):
+#     LIKE = True
+#     DISLIKE = False
+#
+#     REACTION = [
+#         (LIKE, "Лайк"),
+#         (DISLIKE, "Дизлайк"),
+#         (None, "Нет реакции"),
+#     ]
+#
+#     author = models.ForeignKey(
+#         to='auth_app.User',
+#         on_delete=models.SET_NULL,
+#         null=True,
+#         verbose_name='Автор реакции'
+#     )
+#
+#     target = models.ForeignKey(
+#         to=ProjectComments,
+#         on_delete=models.CASCADE,
+#         related_name='project_comment_reactions',
+#         verbose_name='Комментарий'
+#     )
+#
+#     reaction = models.BooleanField(
+#         choices=REACTION,
+#         null=True,
+#         blank=True,
+#         verbose_name='Реакция на комментарий'
+#     )
+#
+#     class Meta:
+#         constraints = [
+#             models.UniqueConstraint(fields=['author', 'target'], name='unique_project_comment_reaction')
+#         ]

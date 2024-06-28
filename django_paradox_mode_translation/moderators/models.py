@@ -29,7 +29,7 @@ class Query(models.Model):
     )
 
     query_author = models.ForeignKey(
-        to='translators_hub.User',
+        to='auth_app.User',
         on_delete=models.SET_NULL,
         related_name="user_queries",
         default=None,
@@ -52,7 +52,7 @@ class Query(models.Model):
     )
 
     query_considered = models.ForeignKey(
-        to='translators_hub.User',
+        to='auth_app.User',
         on_delete=models.SET_NULL,
         related_name='queries_in_work',
         null=True,

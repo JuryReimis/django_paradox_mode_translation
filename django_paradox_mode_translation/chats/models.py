@@ -27,7 +27,7 @@ class PrivateChat(Chat):
     CHAT_TYPE = 'private'
 
     members = models.ManyToManyField(
-        to='translators_hub.User',
+        to='auth_app.User',
         related_name='private_chats',
         verbose_name='Пользователи чата'
     )
@@ -76,7 +76,7 @@ class Message(models.Model):
     )
 
     author = models.ForeignKey(
-        to='translators_hub.User',
+        to='auth_app.User',
         null=True,
         on_delete=models.SET_NULL,
         verbose_name="Автор комментария"

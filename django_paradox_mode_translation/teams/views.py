@@ -7,7 +7,7 @@ from django.views import generic
 
 from teams.forms import InviteUserForm, CreateTeamForm, SearchTeamForm
 from teams.models import Teams, TeamInvites, TeamMembers
-from translators_hub.models import User
+from auth_app.models import User
 
 from slugify import slugify
 
